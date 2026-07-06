@@ -23,7 +23,7 @@ repository               : "mbatuhancelik/batuhancelik.github.io"
 #               Additional customization can be done by editing /_includes/author-profile.html
 author:
   # Biographic information
-  avatar           : "profile.png"
+  avatar           : "profile.jpg"
   name             : "Batuhan Celik"
   pronouns         : "They/them"
   bio              : "Prospective master/PhD student interested in cognitive AI, curiosity driven learning, and causality." #TODO: edit this depending on your application
