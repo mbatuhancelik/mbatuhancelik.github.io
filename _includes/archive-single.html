@@ -32,7 +32,15 @@
       {% else %}
         <a href="{{ base_path }}{{ post.url }}" rel="permalink">{{ title }}</a>
       {% endif %}
+
+      
+    
     </h2>
+    {% if post.authors %}
+    <p class="archive__item-authors" style="margin-top: -0.4em; margin-bottom: 0.25em; font-size: 0.90em; font-family: sans-serif;">
+      {{ post.authors }}
+    </p >
+    {% endif %}
     
     {% if post.read_time %}
       <p class="page__meta"><i class="fa fa-clock" aria-hidden="true"></i> {% include read-time.html %}</p>
