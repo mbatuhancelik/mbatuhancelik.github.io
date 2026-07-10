@@ -14,6 +14,31 @@ In this paper, we propose and realize a new deep learning architecture for disco
 
 [Arxiv](https://arxiv.org/abs/2309.00889), [IEEExplore](https://ieeexplore.ieee.org/document/10382551)
 
+### Core Contributions
+
+- **Explicit Relational Discretization**: By integrating a Gumbel-Sigmoid bottleneck within a self-attention mechanism, the network forces continuous attention weights into interpretable, binary adjacency matrices ($A \in \{0, 1\}^{N \times N}$). Thus, the decoder is forced to interpret this signal as existance of a specific relation between objects instead of relying on sensory data. The result is self-emergence of intuitive relational symbols such as `on top of` or `the left of`. Moreover, these discrete symbols can be interpreted as a ruleset.
+
+- **Variable-Length Entity Processing**: The model scales to scenes containing an arbitrary number of independent physical objects without requiring structural or parametric reconfiguration. This is achieved by preserving the dimension for number of objects throughout the network alongside the batch dimension.
+
+- **Self-Supervised Grounding**: Symbol formation is guided entirely by an auxiliary forward dynamics task (predicting the continuous displacements $\Delta x, \Delta y, \Delta z$ of objects), capturing environment dynamics with minimal outside supervision.
+
+### My Contributions
+
+- Designed and executed the simulated **UR10 tabletop manipulation environment** with its effect and data visualizations. 
+
+- Created an **autonomous experimentation pipeline** with custom scheduling and WandB cloud integration, facilitated rapid experimentation(10-50 runs per night, automatically scheduled considering the available VRAM, 80-95% VRAM usage).
+
+- Throughly **tested the previously proposed attentive deepsym architecture** and identified its shortcomings in predicting effects in scenes containing two identical structures. Please note that while the paper uses 4 object environments, these models are designed with 12 objects in mind, which our future work focused on.
+
+- Using these findings, devised the **relational symbols** concept and developed the self-attention bottleneck architecture.
+
+- Conducted post-training probing analysis to verify the emergent semantics of the discrete latent vectors
+
+## Experimental Results
+
+
+
+
 ### BibTeX
 ```bibtex
 @article{Ahmetoglu_2024,
