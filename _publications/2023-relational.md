@@ -14,29 +14,69 @@ In this paper, we propose and realize a new deep learning architecture for disco
 
 [Arxiv](https://arxiv.org/abs/2309.00889), [IEEExplore](https://ieeexplore.ieee.org/document/10382551)
 
-### Core Contributions
+## 📺 Promotional Video and Model Breakdown
 
-- **Explicit Relational Discretization**: By integrating a Gumbel-Sigmoid bottleneck within a self-attention mechanism, the network forces continuous attention weights into interpretable, binary adjacency matrices ($A \in \{0, 1\}^{N \times N}$). Thus, the decoder is forced to interpret this signal as existance of a specific relation between objects instead of relying on sensory data. The result is self-emergence of intuitive relational symbols such as `on top of` or `the left of`. Moreover, these discrete symbols can be interpreted as a ruleset.
+<div style="text-align: center; margin: 2rem 0; width: 100%;">
+  <video 
+    width="100%" 
+    controls 
+    preload="metadata"
+    style="border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.15); max-height: 480px; background: #000;">
+    <source src="https://aahmetoglu.com/static/relational_deepsym.mp4" type="video/mp4">
+    Your browser does not support the video tag.
+  </video>
+  <p style="font-style: italic; color: #666; margin-top: 0.75rem; font-size: 0.95rem;">
+    Autonomous multi-object symbol discovery and effect prediction rollouts on the simulated UR10 tabletop manipulation platform.
+  </p>
+</div>
 
-- **Variable-Length Entity Processing**: The model scales to scenes containing an arbitrary number of independent physical objects without requiring structural or parametric reconfiguration. This is achieved by preserving the dimension for number of objects throughout the network alongside the batch dimension.
+## Proposed Architecture
 
-- **Self-Supervised Grounding**: Symbol formation is guided entirely by an auxiliary forward dynamics task (predicting the continuous displacements $\Delta x, \Delta y, \Delta z$ of objects), capturing environment dynamics with minimal outside supervision.
+![Alternative text description](/images/DeepSym.png)
 
-### My Contributions
+Relational DeepSym introduces an end-to-end neural pipeline designed to convert sensorimotor data into discrete symbolic representations.
 
-- Designed and executed the simulated **UR10 tabletop manipulation environment** with its effect and data visualizations. 
+The information flow within the model operates through three synchronized mechanisms:
+1. **Categorical Entity Discretization:** Object features and locations extracted from the scene are passed through a MLP. **Gumbel-Sigmoid activation layer** is used to generate discrete latent vectors .
+2. **Relational Symbols:** Concurrently, object features and locations feed into a modified self-attention block. The network routes the standard query ($Q$) and key ($K$) continuous dot-products through a structural Gumbel-Sigmoid layer. This mathematical constraint forces continuous attention fields to settle into sparse, binary adjacency matrices ($A \in \{0, 1\}^{N \times N}$), uncovering explicit relational links (e.g., spatial stacking or lateral orientation) without external supervision.
+3. **Discrete Action Interfacing:** The robot interacts with the tabletop environment utilizing a predefined repertoire of macro-actions (e.g., `place object A left of object B`). Because displacement and targets are structurally deterministic, actions are injected as categorical vectors. 
+
+By calculating the continuous matrix multiplication of the binarized relations, the learned object properties, and the input action vectors, the decoder optimizes an auxiliary forward dynamics module. The **model learns valid symbols solely by attempting to minimize the prediction error** of continuous environmental displacements ($\Delta x, \Delta y, \Delta z$).
+
+## Core Contributions
+
+- **Explicit Relational Discretization**: By integrating a Gumbel-Sigmoid bottleneck within a self-attention mechanism, the network forces continuous attention weights into interpretable, binary adjacency matrices ($A \in \{0, 1\}^{N \times N}$). Thus, the decoder is forced to interpret this signal as the existence of a specific relation between two objects. This rich representation layer relieves the encoder from interpreting object-object relations and allows it to focus entirely on object-specific affordances. Concurrently, relational symbols can be interpreted as a self-emerging relation graph, capturing complex multi-object interactions. The result is the self-emergence of intuitive relational symbols—such as `on top of` or `to the left of`—which can describe complex scenes when used in conjunction.
+  
+  As a result, object-specific and relational symbols allow us to construct semantic binary representations of physical environments directly from raw sensorimotor data.
+  
+  Notably, this architecture is natively scaled to capture interactions containing more than 4 objects. While empirical evaluations within the paper are bounded to 4–5 object setups due to data scaling and baseline constraints, future work focus on evaluating scalability across significantly higher object numbers.
+
+- **Variable-Length Entity Processing**: The model scales to scenes containing an arbitrary number of independent physical objects without requiring structural or parametric reconfiguration. This is achieved by explicitly preserving the dimension representing the total number of objects throughout the network layers, processed symmetrically alongside the standard batch dimension.
+
+- **Self-Supervised Grounding**: Symbol formation is guided entirely by an auxiliary forward dynamics task (predicting the continuous displacements $\Delta x, \Delta y, \Delta z$ of objects), capturing complex environment dynamics with minimal outside supervision.
+
+## My Contributions
+
+- Designed and implemented the simulated **UR10 tabletop manipulation environment** experiments with their data visualizations. 
 
 - Created an **autonomous experimentation pipeline** with custom scheduling and WandB cloud integration, facilitated rapid experimentation(10-50 runs per night, automatically scheduled considering the available VRAM, 80-95% VRAM usage).
 
 - Throughly **tested the previously proposed attentive deepsym architecture** and identified its shortcomings in predicting effects in scenes containing two identical structures. Please note that while the paper uses 4 object environments, these models are designed with 12 objects in mind, which our future work focused on.
 
-- Using these findings, devised the **relational symbols** concept and developed the self-attention bottleneck architecture.
+- Using these findings, **devised the relational symbols** concept and co-developed the self-attention bottleneck architecture.
 
-- Conducted post-training probing analysis to verify the emergent semantics of the discrete latent vectors
+- Conducted **post-training analysis to verify the emergent semantics of the discrete latent vectors**.
 
 ## Experimental Results
 
+The framework was benchmarked against leading symbol discovery baselines across environments of increasing complexity. Relational DeepSym demonstrated a notable reduction in Mean Squared Error (MSE) when mapping multi-object spatial dynamics:
 
+| Dataset Configuration | Vanilla DeepSym MSE (cm) | Attentive DeepSym MSE (cm) | Relational DeepSym MSE (cm) |
+| :--- | :---: | :---: | :---: |
+| **2-Object Environment** | $2.22 \pm 0.56$ | $0.89 \pm 0.10$ | **$0.50 \pm 0.03$** |
+| **3-Object Environment** | $3.06 \pm 0.16$ | $2.55 \pm 0.09$ | **$1.67 \pm 0.02$** |
+| **4-Object Environment** | $4.26 \pm 0.68$ | $2.75 \pm 0.12$ | **$2.00 \pm 0.04$** |
+| **Mixed Scenes (2–4 Objects)** | $2.38 \pm 0.25$ | $1.86 \pm 0.12$ | **$1.35 \pm 0.04$** |
 
 
 ### BibTeX
@@ -54,4 +94,17 @@ In this paper, we propose and realize a new deep learning architecture for disco
    year={2024},
    month=Feb, pages={1977–1984} }
 
-\```
+<style>
+  /* Reduce side padding for the main content area */
+  #main {
+    
+    padding-right: 1em !important;
+    max-width: 95% !important; /* Allows the content to expand wider */
+  }
+
+  /* Optional: If you want to reduce the gap between the sidebar and the content */
+  .archive {
+    padding-right: 0 !important;
+  }
+</style>
+
