@@ -38,14 +38,14 @@ Relational DeepSym introduces an end-to-end neural pipeline designed to convert 
 
 The information flow within the model operates through three synchronized mechanisms:
 1. **Categorical Entity Discretization:** Object features and locations extracted from the scene are passed through a MLP. **Gumbel-Sigmoid activation layer** is used to generate discrete latent vectors .
-2. **Relational Symbols:** Concurrently, object features and locations feed into a modified self-attention block. The network routes the standard query ($Q$) and key ($K$) continuous dot-products through a structural Gumbel-Sigmoid layer. This mathematical constraint forces continuous attention fields to settle into sparse, binary adjacency matrices ($A \in \{0, 1\}^{N \times N}$), uncovering explicit relational links (e.g., spatial stacking or lateral orientation) without external supervision.
+2. **Relational Symbols:** Concurrently, object features and locations feed into a modified self-attention block. The network routes the standard query ($Q$) and key ($K$) continuous dot-products through a structural Gumbel-Sigmoid layer. This mathematical constraint forces continuous attention fields to settle into sparse, binary adjacency matrices ($$A \in \{0, 1\}^{N \times N}$$), uncovering explicit relational links (e.g., spatial stacking or lateral orientation) without external supervision.
 3. **Discrete Action Interfacing:** The robot interacts with the tabletop environment utilizing a predefined repertoire of macro-actions (e.g., `place object A left of object B`). Because displacement and targets are structurally deterministic, actions are injected as categorical vectors. 
 
-By calculating the continuous matrix multiplication of the binarized relations, the learned object properties, and the input action vectors, the decoder optimizes an auxiliary forward dynamics module. The **model learns valid symbols solely by attempting to minimize the prediction error** of continuous environmental displacements ($\Delta x, \Delta y, \Delta z$).
+By calculating the continuous matrix multiplication of the binarized relations, the learned object properties, and the input action vectors, the decoder optimizes an auxiliary forward dynamics module. The **model learns valid symbols solely by attempting to minimize the prediction error** of continuous environmental displacements ($$\Delta x, \Delta y, \Delta z$$).
 
 ## Core Contributions
 
-- **Explicit Relational Discretization**: By integrating a Gumbel-Sigmoid bottleneck within a self-attention mechanism, the network forces continuous attention weights into interpretable, binary adjacency matrices ($A \in \{0, 1\}^{N \times N}$). Thus, the decoder is forced to interpret this signal as the existence of a specific relation between two objects. This rich representation layer relieves the encoder from interpreting object-object relations and allows it to focus entirely on object-specific affordances. Concurrently, relational symbols can be interpreted as a self-emerging relation graph, capturing complex multi-object interactions. The result is the self-emergence of intuitive relational symbols—such as `on top of` or `to the left of`—which can describe complex scenes when used in conjunction.
+- **Explicit Relational Discretization**: By integrating a Gumbel-Sigmoid bottleneck within a self-attention mechanism, the network forces continuous attention weights into interpretable, binary adjacency matrices ($$A \in \{0, 1\}^{N \times N}$$). Thus, the decoder is forced to interpret this signal as the existence of a specific relation between two objects. This rich representation layer relieves the encoder from interpreting object-object relations and allows it to focus entirely on object-specific affordances. Concurrently, relational symbols can be interpreted as a self-emerging relation graph, capturing complex multi-object interactions. The result is the self-emergence of intuitive relational symbols—such as `on top of` or `to the left of`—which can describe complex scenes when used in conjunction.
   
   As a result, object-specific and relational symbols allow us to construct semantic binary representations of physical environments directly from raw sensorimotor data.
   
@@ -53,7 +53,7 @@ By calculating the continuous matrix multiplication of the binarized relations, 
 
 - **Variable-Length Entity Processing**: The model scales to scenes containing an arbitrary number of independent physical objects without requiring structural or parametric reconfiguration. This is achieved by explicitly preserving the dimension representing the total number of objects throughout the network layers, processed symmetrically alongside the standard batch dimension.
 
-- **Self-Supervised Grounding**: Symbol formation is guided entirely by an auxiliary forward dynamics task (predicting the continuous displacements $\Delta x, \Delta y, \Delta z$ of objects), capturing complex environment dynamics with minimal outside supervision.
+- **Self-Supervised Grounding**: Symbol formation is guided entirely by an auxiliary forward dynamics task (predicting the continuous displacements $$\Delta x, \Delta y, \Delta z$$ of objects), capturing complex environment dynamics with minimal outside supervision.
 
 ## My Contributions
 
@@ -73,10 +73,10 @@ The framework was benchmarked against leading symbol discovery baselines across 
 
 | Dataset Configuration | Vanilla DeepSym MSE (cm) | Attentive DeepSym MSE (cm) | Relational DeepSym MSE (cm) |
 | :--- | :---: | :---: | :---: |
-| **2-Object Environment** | $2.22 \pm 0.56$ | $0.89 \pm 0.10$ | **$0.50 \pm 0.03$** |
-| **3-Object Environment** | $3.06 \pm 0.16$ | $2.55 \pm 0.09$ | **$1.67 \pm 0.02$** |
-| **4-Object Environment** | $4.26 \pm 0.68$ | $2.75 \pm 0.12$ | **$2.00 \pm 0.04$** |
-| **Mixed Scenes (2–4 Objects)** | $2.38 \pm 0.25$ | $1.86 \pm 0.12$ | **$1.35 \pm 0.04$** |
+| **2-Object Environment** | $$2.22 \pm 0.56$$ | $$0.89 \pm 0.10$$ | **$$\boldsymbol{0.50 \pm 0.03}$$** |
+| **3-Object Environment** | $$3.06 \pm 0.16$$ | $$2.55 \pm 0.09$$ | **$$\boldsymbol{1.67 \pm 0.02}$$** |
+| **4-Object Environment** | $$4.26 \pm 0.68$$ | $$2.75 \pm 0.12$$ | **$$\boldsymbol{2.00 \pm 0.04}$$** |
+| **Mixed Scenes (2–4 Objects)** | $$2.38 \pm 0.25$$ | $$1.86 \pm 0.12$$ | **$$\boldsymbol{1.35 \pm 0.04}$$** |
 
 
 ### BibTeX
