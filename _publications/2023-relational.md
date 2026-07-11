@@ -14,6 +14,9 @@ In this paper, we propose and realize a new deep learning architecture for disco
 
 [Arxiv](https://arxiv.org/abs/2309.00889), [IEEExplore](https://ieeexplore.ieee.org/document/10382551)
 
+[GitHub](https://github.com/alper111/attentive-deepsym)(Although I didnt push it, my code is in there!)
+
+
 ## 📺 Promotional Video and Model Breakdown
 
 I strongly suggest watching this video for a better understanding of this paper. If you do so, please jump to **My Contributions** section.
