@@ -16,6 +16,8 @@ In this paper, we propose and realize a new deep learning architecture for disco
 
 ## 📺 Promotional Video and Model Breakdown
 
+I strongly suggest watching this video for a better understanding of this paper. If you do so, please jump to **My Contributions** section.
+
 <div style="text-align: center; margin: 2rem 0; width: 100%;">
   <video 
     width="100%" 
@@ -29,47 +31,44 @@ In this paper, we propose and realize a new deep learning architecture for disco
     Autonomous multi-object symbol discovery and effect prediction rollouts on the simulated UR10 tabletop manipulation platform.
   </p>
 </div>
+ 
+## 🛠️ Methodology & Core Contributions
 
-## Proposed Architecture
+![Relational DeepSym Pipeline Overview](/images/DeepSym.png)
 
-![Alternative text description](/images/DeepSym.png)
+Relational DeepSym introduces an end-to-end neural pipeline designed to convert continuous sensorimotor experience into grounded, discrete symbolic representations in a self supervised manner.
 
-Relational DeepSym introduces an end-to-end neural pipeline designed to convert sensorimotor data into discrete symbolic representations.
+### 1. Categorical Entity Discretization & Variable-Length Processing
+Object features and spatial locations extracted from the scene are passed through a shared MLP. A **Gumbel-Sigmoid activation layer** is utilized to encode object properties into discrete latent feature vectors. 
 
-The information flow within the model operates through three synchronized mechanisms:
-1. **Categorical Entity Discretization:** Object features and locations extracted from the scene are passed through a MLP. **Gumbel-Sigmoid activation layer** is used to generate discrete latent vectors .
-2. **Relational Symbols:** Concurrently, object features and locations feed into a modified self-attention block. The network routes the standard query ($Q$) and key ($K$) continuous dot-products through a structural Gumbel-Sigmoid layer. This mathematical constraint forces continuous attention fields to settle into sparse, binary adjacency matrices ($$A \in \{0, 1\}^{N \times N}$$), uncovering explicit relational links (e.g., spatial stacking or lateral orientation) without external supervision.
-3. **Discrete Action Interfacing:** The robot interacts with the tabletop environment utilizing a predefined repertoire of macro-actions (e.g., `place object A left of object B`). Because displacement and targets are structurally deterministic, actions are injected as categorical vectors. 
+* **Variable-Length Scaling:** Unlike standard architectures constrained by rigid input dimensions, this model **scales to scenes containing an arbitrary number of independent physical objects without structural or parametric reconfiguration**. This is achieved by explicitly preserving the entity count dimension throughout the network layers, processing it symmetrically alongside the batch dimension. By decoupling the encoder from object-to-object interactions, the network can focus entirely on extracting intrinsic, object-specific affordances.
 
-By calculating the continuous matrix multiplication of the binarized relations, the learned object properties, and the input action vectors, the decoder optimizes an auxiliary forward dynamics module. The **model learns valid symbols solely by attempting to minimize the prediction error** of continuous environmental displacements ($$\Delta x, \Delta y, \Delta z$$).
+### 2. Explicit Relational Discretization
+Concurrently, entity features and locations feed into a **modified self-attention block**. The network discretize the standard query ($$Q$$) and key ($$K$$) dot-products through **Gumbel-Sigmoid** activation.
 
-## Core Contributions
+* **Emergent Relational Graphs:** This mathematical constraint forces continuous attention fields to settle into sparse, binary adjacency matrices ($$A \in \{0, 1\}^{N \times N}$$), compelling the decoder to interpret the signal as existence or absence of an explicit rule-based link. This relieves the entity encoder from tracking multi-object spatial dynamics while allowing for the self-emergence of an **intuitive/interpretable relational graph** (capturing concepts like `on top of` or `to the left of`). 
+* **Scene Semantic Scaling:** Used in conjunction, these property and relational symbols construct a full semantic binary representation of physical environments from raw sensorimotor data. While empirical evaluations within the paper are bounded to 4–5 object setups due to data scaling and baseline constraints, the underlying math natively scales to capture complex interactions among significantly higher object numbers(tested up to 12 in future work).
 
-- **Explicit Relational Discretization**: By integrating a Gumbel-Sigmoid bottleneck within a self-attention mechanism, the network forces continuous attention weights into interpretable, binary adjacency matrices ($$A \in \{0, 1\}^{N \times N}$$). Thus, the decoder is forced to interpret this signal as the existence of a specific relation between two objects. This rich representation layer relieves the encoder from interpreting object-object relations and allows it to focus entirely on object-specific affordances. Concurrently, relational symbols can be interpreted as a self-emerging relation graph, capturing complex multi-object interactions. The result is the self-emergence of intuitive relational symbols—such as `on top of` or `to the left of`—which can describe complex scenes when used in conjunction.
-  
-  As a result, object-specific and relational symbols allow us to construct semantic binary representations of physical environments directly from raw sensorimotor data.
-  
-  Notably, this architecture is natively scaled to capture interactions containing more than 4 objects. While empirical evaluations within the paper are bounded to 4–5 object setups due to data scaling and baseline constraints, future work focus on evaluating scalability across significantly higher object numbers.
+### 3. Discrete Action Interfacing & Self-Supervised Grounding
+The robot interacts with the tabletop environment utilizing a predefined repertoire of discrete macro-actions (e.g., `place object A left of object B`). Because displacement and targets are structurally deterministic, actions are injected as categorical vectors. 
 
-- **Variable-Length Entity Processing**: The model scales to scenes containing an arbitrary number of independent physical objects without requiring structural or parametric reconfiguration. This is achieved by explicitly preserving the dimension representing the total number of objects throughout the network layers, processed symmetrically alongside the standard batch dimension.
+* **Forward Dynamics Grounding:** By calculating the continuous matrix multiplication of the binarized relations, the learned object properties, and the input action vectors, the decoder optimizes a forward dynamics module. The model grounds its symbols without human labels or outside supervision; valid symbols are learned solely by attempting to minimize the prediction error of continuous environmental displacements ($$\Delta x, \Delta y, \Delta z$$). Then the learned symbols can be converted into rulesets for traditional planning methods like PDDL.
 
-- **Self-Supervised Grounding**: Symbol formation is guided entirely by an auxiliary forward dynamics task (predicting the continuous displacements $$\Delta x, \Delta y, \Delta z$$ of objects), capturing complex environment dynamics with minimal outside supervision.
+## 💻 My Contributions
 
-## My Contributions
+- Designed and implemented the simulated **UR10 tabletop manipulation environment** experiments with their data, effect, and symbol visualizations. 
 
-- Designed and implemented the simulated **UR10 tabletop manipulation environment** experiments with their data visualizations. 
+- Created an **autonomous experimentation pipeline** with custom scheduling and WandB cloud integration, facilitated rapid experimentation(10-50 concurrent training runs, automatically scheduled considering the available VRAM, 80-95% VRAM usage).
 
-- Created an **autonomous experimentation pipeline** with custom scheduling and WandB cloud integration, facilitated rapid experimentation(10-50 runs per night, automatically scheduled considering the available VRAM, 80-95% VRAM usage).
+- Throughly **tested the previously proposed attentive deepsym architecture** and identified its shortcomings in encoding scenes containing two identical structures.
 
-- Throughly **tested the previously proposed attentive deepsym architecture** and identified its shortcomings in predicting effects in scenes containing two identical structures. Please note that while the paper uses 4 object environments, these models are designed with 12 objects in mind, which our future work focused on.
-
-- Using these findings, **devised the relational symbols** concept and co-developed the self-attention bottleneck architecture.
+- Using these findings, **devised the relational symbols** concept and co-developed the self-attention module.
 
 - Conducted **post-training analysis to verify the emergent semantics of the discrete latent vectors**.
 
-## Experimental Results
+## 📊 Experimental Results
 
-The framework was benchmarked against leading symbol discovery baselines across environments of increasing complexity. Relational DeepSym demonstrated a notable reduction in Mean Squared Error (MSE) when mapping multi-object spatial dynamics:
+The framework was benchmarked against our previous symbol discovery baselines across environments of increasing complexity. Relational DeepSym demonstrated a notable reduction in MSE when mapping multi-object spatial dynamics:
 
 | Dataset Configuration | Vanilla DeepSym MSE (cm) | Attentive DeepSym MSE (cm) | Relational DeepSym MSE (cm) |
 | :--- | :---: | :---: | :---: |
