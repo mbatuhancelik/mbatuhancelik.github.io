@@ -6,44 +6,32 @@ authors: "<b>Batuhan Çelik</b>, Alper Ahmetoğlu, Emre Uğur, Erhan Öztop"
 permalink: /publication/2023-icdl-scaffolding
 date: 2023-10-02
 venue: 'IEEE International Conference on Development and Learning (ICDL)'
-paperurl : "https://arxiv.org/abs/2309.00904"
+paperurl: "https://arxiv.org/abs/2309.00904"
 ---
 
 ### Abstract
-Exploration and self-observation are key mechanisms of infant sensorimotor development. These processes are
-further guided by parental scaffolding to accelerate skill and
-knowledge acquisition. In developmental robotics, this approach
-has been adopted often by having a human acting as the source of
-scaffolding. In this study, we investigate whether Large Language
-Models (LLMs) can act as a scaffolding agent for a robotic
-system that aims to learn to predict the effects of its actions.
-To this end, an object manipulation setup is considered where
-one object can be picked and placed on top of or in the
-vicinity of another object. The adopted LLM is asked to guide
-the action selection process through algorithmically generated
-state descriptions and action selection alternatives in natural
-language. The simulation experiments that include cubes in this
-setup show that LLM-guided (GPT3.5-guided) learning yields
-significantly faster discovery of novel structures compared to
-random exploration. However, we observed that GPT3.5 fails to
-effectively guide the robot in generating structures with different
-affordances such as cubes and spheres. Overall, we conclude
-that even without fine-tuning, LLMs may serve as a moderate
-scaffolding agent for improving robot learning, however, they still
-lack affordance understanding which limits the applicability of
-the current LLMs in robotic scaffolding tasks.
+Exploration and self-observation are key mechanisms of infant sensorimotor development. These processes are further guided by parental scaffolding to accelerate skill and knowledge acquisition. In developmental robotics, this approach has been adopted often by having a human acting as the source of scaffolding. In this study, we investigate whether Large Language Models (LLMs) can act as a scaffolding agent for a robotic system that aims to learn to predict the effects of its actions. To this end, an object manipulation setup is considered where one object can be picked and placed on top of or in the vicinity of another object. The adopted LLM is asked to guide the action selection process through algorithmically generated state descriptions and action selection alternatives in natural language. The simulation experiments that include cubes in this setup show that LLM-guided (GPT3.5-guided) learning yields significantly faster discovery of novel structures compared to random exploration. However, we observed that GPT3.5 fails to effectively guide the robot in generating structures with different affordances such as cubes and spheres. Overall, we conclude that even without fine-tuning, LLMs may serve as a moderate scaffolding agent for improving robot learning, however, they still lack affordance understanding which limits the applicability of the current LLMs in robotic scaffolding tasks.
 
-[Arxiv](https://arxiv.org/abs/2309.00904), [IEEExplore](https://ieeexplore.ieee.org/document/10364374)
-
+[arXiv](https://arxiv.org/abs/2309.00904) | [IEEExplore](https://ieeexplore.ieee.org/document/10364374)
 
 ## 📺 Exploration & Interactive Breakdown
 
-This study investigates how a Large Language Model can be leveraged as an automated scaffolder to guide high-level robot exploration toward hard-to-reach, structurally complex, or improbable physical arrangements. This study is suggested to relieve the **data collection problem of Relational DeepSym**.
+This study investigates how a Large Language Model can be leveraged as an automated scaffolding agent to guide high-level robot exploration toward hard-to-reach, structurally complex, or statistically improbable physical arrangements. This framework is proposed as an algorithmic solution to **achieve high throughput scaffolding while probing grounded inference capabilities of available LLMs**.
 
-Notably **capabilities of LLMs improved significantly since this paper released** in ChatGPT 3.5 era. Please judge accordingly.
+*Note: LLM capabilities have progressed significantly since the publication of this work during the GPT-3.5 era. The results documented below serve as an foundational benchmark of early text-only reasoning models applied to physical scaffolding.*
 
 <div style="text-align: center; margin: 2rem 0; width: 100%;">
-  <iframe width="1138" height="640" src="https://www.youtube.com/embed/qLTS8Pt-7Ks" title="Developmental Scaffolding with Large Language Models: Demonstration video" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+  <iframe 
+    width="100%" 
+    height="640" 
+    src="https://www.youtube.com/embed/qLTS8Pt-7Ks" 
+    title="Developmental Scaffolding with Large Language Models: Demonstration video" 
+    frameborder="0" 
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+    referrerpolicy="strict-origin-when-cross-origin" 
+    allowfullscreen
+    style="border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.15);">
+  </iframe>
   <p style="font-style: italic; color: #666; margin-top: 0.75rem; font-size: 0.95rem;">
     LLM-guided pick-and-place task execution loop on the simulated UR10 manipulation platform.
   </p>
@@ -51,36 +39,29 @@ Notably **capabilities of LLMs improved significantly since this paper released*
 
 ## 🛠️ Methodology & Core Contributions
 
-Instead of executing resource-intensive fine-tuning or relying on dense descriptive embodiment alignments, this framework uses the existing foundation-level reasoning of LLMs to steer robot interaction towards hard-to-reach environment configurations.
-
-This simple approach allowed us to probe embodied understanding of LLMs and their wide spread applicability to robotics. 
+Instead of executing resource-intensive fine-tuning or relying on dense descriptive embodiment alignments, this framework leverages the native zero-shot reasoning capabilities of LLMs to steer robot interactions toward complex environment configurations. This minimal approach allows us to directly probe the inherent physical understanding of LLMs and evaluate their broader applicability to robotics.
 
 ### 1. Token-Efficient Prompt Engineering
-
-To bypass continuous active dialogue streams during live execution loops, a stateless prompting cycle resets at each new scene configuration. The framework programmatically constructs structured prompts combining three primary variables:
+To bypass continuous active dialogue streams during live execution loops, a stateless prompting cycle resets at each new scene configuration. The framework programmatically constructs structured context packages combining three primary variables:
 
 * **State Space Mapping ($$S_i$$):** Algorithmic translation of physical objects and spatial coordinates into color-coded natural language tokens (e.g., `the green cube is next to the purple cube`).
-* **Interaction Trajectory History ($$H_{1,\dots,i-1}$$):** A chronological digest of previous actions to ensure temporal conditioning.
+* **Interaction Trajectory History ($$H_{1,\dots,i-1}$$):** A chronological digest of previous actions within the current session to ensure temporal conditioning.
 * **Bounded Action Windows ($$A_{1,\dots,k}$$):** Dynamically filtered sub-lists containing valid, kinematically executable actions extracted directly from the robot's physical repertoire.
 
-The LLM is simply instructed to seek an interesting outcome and is expected to refer to its knowledge on sensorimotor development of humans. The LLM does not know it controls a robot.
+The LLM is prompted broadly to seek an **"interesting outcome"**, implicitly drawing upon its encoded knowledge of human sensorimotor development. Crucially, the model is not explicitly informed that it is controlling a physical robot. To provoke deeper reasoning and stabilize execution selection, the prompt explicitly requires a text explanation before outputting the final choice.
 
-As an old prompting strategy we requested an explanation regarding action selection to provoke deeper reasoning.
-
-An example system prompt:
+**Example System Prompt:**
 ```text
-[System]: There are some objects on the table. Which ma-
-nipulation alternative on them yields an interesting outcome?
+[System]: There are some objects on the table. Which manipulation alternative on them yields an interesting outcome? 
 Choose one and explain.
 Your output should be in the following format:
 <reasoning> some sentences </reasoning>
 Selected action is : <number of the selected action>
 ```
 
-An example user prompt:
+**Example user prompt:**
 ```text
-[User]: There is an orange cube, a green cube, a purple cube, a
-brown sphere, and a light green cube in the current scene.
+[User]: There is an orange cube, a green cube, a purple cube, a brown sphere, and a light green cube in the current scene.
 the green cube is next to the purple cube.
 the brown sphere is in front of the purple cube.
 the light green cube is stacked on the purple cube.
@@ -98,15 +79,13 @@ Possible actions:
 
 ### 2. Chain-of-Thought Reasoning
 
-By forcing the LLM to output its <reasoning> block before finalizing the action selection, and providing session history and interaction at each step of the exploration, we allowed the LLM to increment upon its reasoning. This ensured coherency across multiple actions. 
+Enforcing the `<reasoning>` block to generate prior to the final action selection token allows the model to **incrementally condition its choices on sequential logic**. Providing the running session history alongside immediate scene text at each exploration step ensures behavioral coherence across multiple steps. 
 
-For illustration, once deciding on creating a tall stack, the LLM actively avoided decreasing stack height if further stacking operations were not available. However, once the tallest stack is achieved, GPT3.5 dismantled the stack to look for other `interesting` configurations.
+For instance, once **committing to constructing a tall stack**, the model actively avoids diminishing the stack height if additional vertical choices are unavailable. Conversely, **once peak structural capacity is achieved, the model deconstructs the stack to seek alternative configurations**.
 
 ### 3. Grounded Knowledge Auditing
 
-The paper provides a thorough test of real-world physical comprehension of GPT3.5(probed by us) and othher models (probed by other works). 
-
-While the GPT effortlessly optimize stacking sequences across uniform primitives like cubes, they exhibit a severe **"cognitive gap"** regarding mixed-physics affordances. When introduced to combinations of cubes and spheres, models routinely choose paths that place cubes on top of spheres—erroneously stating that a sphere acts as a stable foundation block. However, if asked directly `If spheres can be used as a stable base for a tower?` the model gives the correct answer, indicating an inability to utilize its inherent grounded knowledge.
+The study provides a stress test of **embodied comprehension of LLMs**. While models effortlessly optimize stacking sequences across uniform geometries like cubes, they exhibit a severe **"cognitive gap"** when spheres are introduced.
 
 ## 💻 My Contributions
 
@@ -129,7 +108,7 @@ While the GPT effortlessly optimize stacking sequences across uniform primitives
 ## 📊 Experimental Results
 
 
-We compared the LLM scaffolding **against de-facto random exploration policy over 10-step exploration windows**.
+We benchmarked the LLM-guided scaffolding framework against a **baseline random exploration policy over identical 10-step exploration windows**.
 
 ### Tower Construction Efficiency
 
@@ -150,9 +129,9 @@ We compared the LLM scaffolding **against de-facto random exploration policy ove
     <p>
       LLM-scaffolding was evaluated by measuring the <b>maximum tower height achieved (representing rare, hard-to-reach environmental states) over 40 interaction sessions</b>. 
     </p>
-    <p>Notably, nothing in the prompts urges the model to increase the tower height. </p>
+    <p>Crucially, no explicit directives instruct the model to increase the tower height. </p>
     <p>
-      LLM-scaffolded exploration outperformes the random exploration baseline by focusing early action choices on structural accumulation.
+      LLM-scaffolded exploration outperforms the random exploration baseline by focusing early exploration steps on structural accumulation.
       </p>
       <p> In the most complex setup, <b>the random exploration policy fails to achieve the tallest stack</b>, whereas the scaffolded system regularly discovers peak tower heights within minimal operational steps.
     </p>
@@ -165,7 +144,7 @@ We compared the LLM scaffolding **against de-facto random exploration policy ove
 <div style="display: flex; align-items: center; justify-content: space-between; gap: 2rem; margin: 2rem 0; flex-wrap: wrap; direction: rtl;">
   <div style="flex: 1; min-width: 320px; direction: ltr;">
     <p>
-      We observed changing a <b>single word</b> in the prompts could vastly change the results.
+      We observed that changing a <b>single word</b> in the prompts could yielded dramatic changes in behaviour.
     </p>
     <p>
       Changing the word <b><u>interesting</u></b> to <b><u>novel</u></b> significantly decreased the average tower height.
@@ -186,7 +165,7 @@ We compared the LLM scaffolding **against de-facto random exploration policy ove
 
 ### 3. Different Affordances
 
-When **spheres are introduced** to the environment, GPT's inability to use grounded knowledge emerged. Even when we tasked the LLM with creating the tallest stack we observed a significant decrease in the stack height. When probed rigirously we observed GPT to repeatedly hallucinate the sphere as a stable base. The assistants answer bellow provides an illustration.
+When **spheres are introduced** to the environment, GPT's grounding vulnerabilities become apparent. Even under explicit instructions to maximize stack height, the presence of a sphere led to a performance degradation. Qualitative analysis confirmed that the model repeatedly hallucinated the sphere as a stable base. The assistants answer bellow provides an illustration.
 
 <pre><code>[Assistant]: The best action would be to put the blue cube on top of the red sphere.
 This is because</code> <code><b>**the red sphere can provide a stable base for the cube, and the cube can sit 
@@ -198,10 +177,10 @@ securely on top of the sphere**.</b></code></pre>
       Even when the LLM is specifically instructed to creating the tallest stack, introduction of sphere decreased the average stack height by <b>20%</b>.
     </p>
     <p>
-      When the LLM is directly asked if a sphere can provide a stable tower it correctly answered no.
+      When the LLM is directly asked if a sphere can provide a stable tower it correctly answered `No`.
     </p>
     <p>
-      However, it repeatedly failed to utilize this grounded inference during the tower creation task.
+      While the <b>model maintains abstract textual knowledge that a sphere is unstable, it fails to transfer this rule when executing active spatial planning</b>.
     </p>
   </div>
 
@@ -219,7 +198,7 @@ securely on top of the sphere**.</b></code></pre>
 
 ### Future Work
 
-I recognize the **difference between current LLMs and the GPT 3.5 capabilities is paramount**, the most important one being **visual input processing**. After this work, grounded inference capabilities of LLMs increased significantly and describing scenes and actions became way easier due to visual inputs. Therefore, I believe a repatition of these experiments could be fruitful, or even implementable practically complex environments. 
+The gap between early text-only models and modern vision-language-action models (VLMs/VLAMs) is profound—particularly regarding embodied knowledge. By integrating direct visual peripherals, modern multi-modal architectures transcend the limitations of text, allowing the system to perceive spatial geometry, self-affordances, and physical constraints. **This sensory grounding fundamentally improves the model's grasp of embodied knowledge**. Re-evaluating developmental parental scaffolding concepts through the lens of these multimoodal foundation models offers a highly promising path toward establishing practical, robust, and self-correcting exploration loops in complex environments.
 
 
 ### BibTeX
