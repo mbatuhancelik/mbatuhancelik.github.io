@@ -96,6 +96,131 @@ Possible actions:
 ...
 ```
 
+### 2. Chain-of-Thought Reasoning
+
+By forcing the LLM to output its <reasoning> block before finalizing the action selection, and providing session history and interaction at each step of the exploration, we allowed the LLM to increment upon its reasoning. This ensured coherency across multiple actions. 
+
+For illustration, once deciding on creating a tall stack, the LLM actively avoided decreasing stack height if further stacking operations were not available. However, once the tallest stack is achieved, GPT3.5 dismantled the stack to look for other `interesting` configurations.
+
+### 3. Grounded Knowledge Auditing
+
+The paper provides a thorough test of real-world physical comprehension of GPT3.5(probed by us) and othher models (probed by other works). 
+
+While the GPT effortlessly optimize stacking sequences across uniform primitives like cubes, they exhibit a severe **"cognitive gap"** regarding mixed-physics affordances. When introduced to combinations of cubes and spheres, models routinely choose paths that place cubes on top of spheres—erroneously stating that a sphere acts as a stable foundation block. However, if asked directly `If spheres can be used as a stable base for a tower?` the model gives the correct answer, indicating an inability to utilize its inherent grounded knowledge.
+
+## 💻 My Contributions
+
+- **Performed a comprehensive literature review of LLM-robotics applications** and developmental parental scaffolding theories.
+
+- **Co-developed the PyBullet-based UR10 manipulator simulation**, including high-level discrete pick-and-place action spaces.
+
+- **Designed the zero-shot token-efficient state serialization layer**, converting physical scene configurations directly into compact LLM-consumable history inputs.
+
+- **Engineered experiment setups** comparing language-driven high-gain information paths against standard stochastic exploration methods.
+
+- **Created the data visualizations, figures**, and the promotional video of the paper.
+
+- **Uncovered systemic structural hallucinations within GPT-3.5's physical world planning models**, validating semantic failure modes via targeted exploratory tasks.
+
+- **Prepared the first draft and implemented alterations of my collegues**, presenting my work and literature review while ensuring a coherent manuscript using my 2 professor's inputs.
+
+- **Took corresponding author responsilibities**, answered reviews of the ICDL comitee and performed necessary changes on the final draft. 
+
+## 📊 Experimental Results
+
+
+We compared the LLM scaffolding **against de-facto random exploration policy over 10-step exploration windows**.
+
+### Tower Construction Efficiency
+
+<div style="display: flex; align-items: center; justify-content: space-between; gap: 2rem; margin: 2rem 0; flex-wrap: wrap;">
+
+<div style="flex: 1; min-width: 320px; text-align: center;">
+    <img 
+      src="/images/scaffolding_tower_results.png" 
+      alt="Comparison of Maximum Object Height across Exploration Steps" 
+      style="width: 100%; border-radius: 6px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);"
+    />
+    <p style="font-style: italic; color: #666; margin-top: 0.5rem; font-size: 0.85rem;">
+      Fig. 1: Evolution of the maximum height achieved across exploration steps. The solid lines represent the mean maximum height across independent experimental runs.
+    </p>
+  </div>
+  <div style="flex: 1; min-width: 320px;">
+    
+    <p>
+      LLM-scaffolding was evaluated by measuring the <b>maximum tower height achieved (representing rare, hard-to-reach environmental states) over 40 interaction sessions</b>. 
+    </p>
+    <p>Notably, nothing in the prompts urges the model to increase the tower height. </p>
+    <p>
+      LLM-scaffolded exploration outperformes the random exploration baseline by focusing early action choices on structural accumulation.
+      </p>
+      <p> In the most complex setup, <b>the random exploration policy fails to achieve the tallest stack</b>, whereas the scaffolded system regularly discovers peak tower heights within minimal operational steps.
+    </p>
+  </div>
+</div>
+
+
+### Effects of different prompts
+
+<div style="display: flex; align-items: center; justify-content: space-between; gap: 2rem; margin: 2rem 0; flex-wrap: wrap; direction: rtl;">
+  <div style="flex: 1; min-width: 320px; direction: ltr;">
+    <p>
+      We observed changing a <b>single word</b> in the prompts could vastly change the results.
+    </p>
+    <p>
+      Changing the word <b><u>interesting</u></b> to <b><u>novel</u></b> significantly decreased the average tower height.
+    </p>
+  </div>
+
+  <div style="flex: 1; min-width: 320px; text-align: center; direction: ltr;">
+    <img 
+      src="/images/scaffolding_differentadjectives.png" 
+      alt="The Affordance Blindspot Failure Modes" 
+      style="width: 100%; border-radius: 6px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);"
+    />
+    <p style="font-style: italic; color: #666; margin-top: 0.5rem; font-size: 0.85rem;">
+      Fig. 2: Effects of different adjectives on the tower heights in a 5 cubes 2 positions setting.
+    </p>
+  </div>
+</div>
+
+### 3. Different Affordances
+
+When **spheres are introduced** to the environment, GPT's inability to use grounded knowledge emerged. Even when we tasked the LLM with creating the tallest stack we observed a significant decrease in the stack height. When probed rigirously we observed GPT to repeatedly hallucinate the sphere as a stable base. The assistants answer bellow provides an illustration.
+
+<pre><code>[Assistant]: The best action would be to put the blue cube on top of the red sphere.
+This is because</code> <code><b>**the red sphere can provide a stable base for the cube, and the cube can sit 
+securely on top of the sphere**.</b></code></pre>
+
+<div style="display: flex; align-items: center; justify-content: space-between; gap: 2rem; margin: 2rem 0; flex-wrap: wrap; direction: rtl;">
+  <div style="flex: 1; min-width: 320px; direction: ltr;">
+    <p>
+      Even when the LLM is specifically instructed to creating the tallest stack, introduction of sphere decreased the average stack height by <b>20%</b>.
+    </p>
+    <p>
+      When the LLM is directly asked if a sphere can provide a stable tower it correctly answered no.
+    </p>
+    <p>
+      However, it repeatedly failed to utilize this grounded inference during the tower creation task.
+    </p>
+  </div>
+
+  <div style="flex: 1; min-width: 320px; text-align: center; direction: ltr;">
+    <img 
+      src="/images/scaffolding_towercreation.png" 
+      alt="The Affordance Blindspot Failure Modes" 
+      style="width: 100%; border-radius: 6px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);"
+    />
+    <p style="font-style: italic; color: #666; margin-top: 0.5rem; font-size: 0.85rem;">
+      Fig. 3: Comparison of average heights in different environments during LLM scaffolded sessions with tower creation task and the corresponding system prompt.
+    </p>
+  </div>
+</div>
+
+### Future Work
+
+I recognize the **difference between current LLMs and the GPT 3.5 capabilities is paramount**, the most important one being **visual input processing**. After this work, grounded inference capabilities of LLMs increased significantly and describing scenes and actions became way easier due to visual inputs. Therefore, I believe a repatition of these experiments could be fruitful, or even implementable practically complex environments. 
+
 
 ### BibTeX
 ```bibtex
