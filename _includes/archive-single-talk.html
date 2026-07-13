@@ -35,8 +35,14 @@
     {% if post.read_time %}
       <p class="page__meta"><i class="fa fa-clock" aria-hidden="true"></i> {% include read-time.html %}</p>
     {% endif %}
+    {% if post.authors %}<p class="archive__item-excerpt" itemprop="description" style="margin-top: -0.5em;margin-bottom: -0em;">{{post.authors}}{% endif %}
     {% if post.date %}<p class="page__meta"><i class="fa fa-clock" aria-hidden="true"></i> {{ post.date | date: '%B %d, %Y' }}</p>{% endif %}
     {% if post.venue %}<p class="archive__item-excerpt" itemprop="description">{{post.type}}, {{ post.venue }},  {{post.location}} {% endif %}
-    {% if post.excerpt %}<p class="archive__item-excerpt" itemprop="description">{{ post.excerpt | markdownify }}</p>{% endif %}
+    {% if post.excerpt %}<p class="archive__item-excerpt" itemprop="description">{{ post.content }}</p>{% endif %}
+    {% if post.thumbnail %}
+      <div class="archive__item-teaser" style="flex-shrink: 0; width: 100%;">
+        <img src="{{ post.thumbnail | relative_url }}" alt="{{ post.title }}" style="width: 100%; border-radius: 4px; object-fit: cover;">
+      </div>
+    {% endif %}
   </article>
 </div>
