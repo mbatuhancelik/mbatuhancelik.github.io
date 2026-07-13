@@ -233,6 +233,9 @@ collections:
   talks:
     output: true
     permalink: /:collection/:path/
+  presentations:                # Add this block
+    output: true
+    permalink: /presentations/:path/
 
 
 # These settings control how pages and collections are included in the site
@@ -285,7 +288,7 @@ defaults:
   # _talks
   - scope:
       path: ""
-      type: talks
+      type: presentations
     values:
       layout: talk
       author_profile: true
