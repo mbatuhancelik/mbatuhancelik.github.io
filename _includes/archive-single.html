@@ -1,16 +1,15 @@
 {% include base_path %}
 
-{% if post.header.teaser %}
-  {% capture teaser %}{{ post.header.teaser }}{% endcapture %}
-{% else %}
-  {% assign teaser = site.teaser %}
-{% endif %}
+
 
 {% if post.id %}
   {% assign title = post.title | markdownify | remove: "<p>" | remove: "</p>" %}
 {% else %}
   {% assign title = post.title %}
 {% endif %}
+
+
+
 
 <div class="{{ include.type | default: "list" }}__item">
   <article class="archive__item" itemscope itemtype="http://schema.org/CreativeWork">
@@ -59,7 +58,25 @@
     {% elsif post.excerpt and site.read_more == 'enabled' %}
     <p class="archive__item-excerpt" itemprop="description"><p>{{ post.excerpt | markdownify | remove: '<p>' | remove: '</p>' }}<strong><a href="{{ base_path }}{{ post.url }}" rel="permalink"> Read more</a></strong></p></p>
     {% endif %}
-    
+    {% if post.header.video_teaser %}
+  <div class="archive__item-teaser" style="position:relative; width:100%;">
+    <video autoplay loop muted playsinline width="100%" style="display:block; object-fit:cover;">
+      <source src="{{ post.header.video_teaser | relative_url }}" type="video/mp4">Your browser does not support the video tag.
+    </video>
+  </div>
+{% else %}
+  {% if post.header.teaser %}
+    {% capture teaser %}{{ post.header.teaser }}{% endcapture %}
+  {% else %}
+    {% assign teaser = site.teaser %}
+  {% endif %}
+
+  {% if teaser %}
+    <div class="archive__item-teaser">
+      <img src="{{ teaser | relative_url }}" alt="{{ post.title }}">
+    </div>
+  {% endif %}
+{% endif %}
     {% if post.citation and post.paperurl and post.slidesurl and post.bibtexurl %}
       <p>Recommended citation: {{ post.citation }}<br /><a href="{{ post.paperurl }}">Download Paper</a> | <a href="{{ post.slidesurl }}">Download Slides</a> | <a href="{{ post.bibtexurl }}">Download Bibtex</a></p>
     {% elsif post.citation and post.paperurl and post.slidesurl %}
