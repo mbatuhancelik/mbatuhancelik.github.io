@@ -44,3 +44,17 @@
     {% endfor %}
   </ul>
 </nav>
+
+<style>
+.nav__list {
+  float: none !important;
+  margin: 0 auto !important;
+  text-align: center !important;
+}
+
+.nav__sub-title {
+  display: inline-flex !important;
+  justify-content: center !important;
+  float: none !important;
+}
+</style>
