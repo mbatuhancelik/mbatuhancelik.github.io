@@ -1,6 +1,6 @@
 ---
 title: "FPGA Design Optimization using Genetic Algorithms"
-collection: portfolio
+collection: projects
 excerpt: "Automating High-Level Synthesis (HLS) design space exploration using a custom, constraint-aware genetic algorithm on a non-convex, integer-boolean search space."
 venue: "CMPE583 (Reconfigurable Programming) Term Project"
 date: 05.06.2023

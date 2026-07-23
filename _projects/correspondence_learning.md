@@ -1,6 +1,6 @@
 ---
 title: "Human-to-Robot Skill Transfer with Blending CNMPs"
-collection: portfolio
+collection: projects
 header:
     video_teaser: '/images/human_to_robot.mp4'
 date: 28.08.2023
