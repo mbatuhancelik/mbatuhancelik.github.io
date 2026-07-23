@@ -1,10 +1,9 @@
 ---
 title: "FPGA Design Optimization using Genetic Algorithms"
 collection: portfolio
-header:
-  teaser: '/images/fpga_ga_evolution_path.png'
 excerpt: "Automating High-Level Synthesis (HLS) design space exploration using a custom, constraint-aware genetic algorithm on a non-convex, integer-boolean search space."
 venue: "CMPE583 (Reconfigurable Programming) Term Project"
+date: 05.06.2023
 ---
 
 Design parameter optimization in FPGA programming is a **non-convex, high-dimensional, integer-boolean optimization problem**. Because closed-form mathematical solutions do not exist for compiler-driven hardware generation, industrial FPGA designs are traditionally tuned through trial, error, and designer intuition. 
