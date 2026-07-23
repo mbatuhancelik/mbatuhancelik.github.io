@@ -2,7 +2,8 @@
 title: "Human-to-Robot Skill Transfer with Blending CNMPs"
 collection: portfolio
 header:
-    video_teaser: '/images/human2robot_cnmp_demo.mp4'
+    video_teaser: '/images/human_to_robot.mp4'
+date: 28.08.2023
 excerpt: 'Extending the Blending-CNMP framework to noisy, vision-based human demonstrations — bridging the embodiment and Cartesian-to-joint-space gap to transfer reaching skills between a human and the Torobo manipulator.'
 ---
 
@@ -13,8 +14,10 @@ excerpt: 'Extending the Blending-CNMP framework to noisy, vision-based human dem
 
 This project extends the Blending Conditional Neural Movement Primitives (Blending-CNMP) framework — originally validated only on clean, simulated robot-to-robot data — to a human-in-the-loop setting. Human reaching movements were captured with an Intel RealSense camera and MediaPipe, which introduces low-frequency drift that the blending-CNMP encoder proved highly sensitive to. A filtering and normalization pipeline conditions these trajectories before encoding, allowing the shared latent space to converge. The result is bidirectional skill transfer between a human demonstrator and the Torobo manipulator, mapping human Cartesian coordinates to Torobo joint-space trajectories on unseen, interpolated targets.
 
-<div class="archive__item-teaser" style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; max-width: 100%; margin: 20px 0;">
-    <iframe src="https://www.youtube.com/embed/71mbbTE65yU" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0;" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+<div class="archive__item-teaser">
+    <video autoplay loop muted playsinline width="100%" style="display:block; object-fit:cover;">
+      <source src="/images/human_to_robot.mp4" type="video/mp4">Your browser does not support the video tag.
+    </video>
 </div>
 
 *Demo: human → robot transfer on a validation target **between** two trained angles — a generalization test, not a replay of a trained motion. The robot → human direction was validated numerically only.*

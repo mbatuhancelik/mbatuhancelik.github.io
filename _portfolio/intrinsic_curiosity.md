@@ -2,8 +2,9 @@
 title: "Intrinsic Curiosity for Deep Symbolic Robot Learning"
 collection: portfolio
 header:
-    video_teaser: '/images/instrinsic_curiosity_demo_fixed.mp4'
+    video_teaser: '/images/instrinsic_curiosity_demo.mp4'
 excerpt: 'The prior [Relational DeepSym](/publications/2023-relational) framework requires on the order of **1 million samples** just to learn dynamics in a 4-object environment — a data bottleneck rooted in its reliance on uniform random exploration. I proposed and and led this project, my **graduation project**, to tackle this bottleneck directly: to explore complex, counter-intuitive, and high-information-gain interactions and to probe the limitations of the Relational DeepSym architecture.'
+date: 04.02.2024
 ---
 
 ## Abstract
