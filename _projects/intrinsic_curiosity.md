@@ -1,6 +1,6 @@
 ---
 title: "Intrinsic Curiosity for Deep Symbolic Robot Learning"
-collection: portfolio
+collection: projects
 header:
     video_teaser: '/images/instrinsic_curiosity_demo.mp4'
 excerpt: 'The prior [Relational DeepSym](/publications/2023-relational) framework requires on the order of **1 million samples** just to learn dynamics in a 4-object environment — a data bottleneck rooted in its reliance on uniform random exploration. I proposed and and led this project, my **graduation project**, to tackle this bottleneck directly: to explore complex, counter-intuitive, and high-information-gain interactions and to probe the limitations of the Relational DeepSym architecture.'
@@ -15,7 +15,7 @@ Curiosity is a form of intrinsic motivation key to reinforcing active learning a
 
 <div class="archive__item-teaser">
     <video autoplay loop muted playsinline width="100%" style="display:block; object-fit:cover;">
-      <source src="/images/instrinsic_curiosity_demo_fixed.mp4" type="video/mp4">Your browser does not support the video tag.
+      <source src="/images/instrinsic_curiosity_demo.mp4" type="video/mp4">Your browser does not support the video tag.
     </video>
 </div>
 
