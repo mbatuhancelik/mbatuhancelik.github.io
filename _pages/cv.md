@@ -48,57 +48,62 @@ I work on neurosymbolic approaches to robot learning — extracting symbolic, co
 
 ## Research Experience
 
-### **Research Intern** | *Symbiotic Intelligent Systems Research Center (SISREC), Osaka University*, Japan[cite: 1, 4, 5]
-*June 2023 – Sept 2023*[cite: 1]
+### **Research Intern** | *Symbiotic Intelligent Systems Research Center (SISREC), Osaka University*, Japan
+*June 2023 – Sept 2023*
 
 * **Developmental Scaffolding with Large Language Models(ICDL 2023):** 
 
-  * Conceived and led the study as first author, designing a zero-shot, token-efficient state serialization layer converting physical scene configurations into LLM-consumable inputs.
+  * Conceived and led the study as **first author**, designing a zero-shot, token-efficient state serialization layer converting physical scene configurations into LLM-consumable inputs.
   * Co-developed the PyBullet-based UR10 simulation and designed experiments comparing language-guided high-information-gain exploration against standard stochastic exploration, uncovering systematic hallucinations in GPT-3.5's physical-world planning.
-  * Drafted the manuscript and figures, incorporated co-author and faculty feedback, and served as corresponding author through the ICDL revision process.
+  * Drafted the manuscript and figures, incorporated co-author and faculty feedback, and served as **corresponding author** through the ICDL revision process.
 
   [Publication Page](/publication/2023-icdl-scaffolding)
 
-* **Human-to-Robot Motion Transfer(Blending-CNMPs):** 
 
-  * Extended the Blending-CNMP architecture to a human-in-the-loop setup using an Intel RealSense camera and MediaPipe 3D tracking[cite: 4]. 
-  * Designed a trajectory filtering and normalization pipeline to suppress low-frequency tracking drift, achieving cross-embodiment Cartesian-to-joint-space motion transfer to the Torobo manipulator with a **~3 cm** end-effector accuracy[cite: 4].
-
-  [Project Page](/projects/correspondence_learning)
+* **Human-to-Robot Motion Transfer (Blending-CNMPs):** Extended the Blending-CNMP architecture to a human-in-the-loop setup using an Intel RealSense camera and MediaPipe 3D tracking — full write-up under Selected Projects.
 
 ### **Research Intern** | *Cognitive Learning and Robotics Lab (CoLoRs), Boğaziçi University*,  Turkey
-*Aug 2022 – Jan 2024*[cite: 1]
+*Aug 2022 – Jan 2024*
 
 * **Discovering Predictive Relational Object Symbols(RA-L 2024):** 
-  * Designed and implemented the PyBullet simulation experiments for *Relational DeepSym*[cite: 3]. 
-  * Co-developed a discrete self-attention block using Gumbel-Sigmoid activations to extract sparse relational adjacency matrices ($$A \in \{0, 1\}^{N \times N}$$) alongside object properties[cite: 3]. 
-  * Built an automated experimentation pipeline with WandB cloud integration to manage concurrent VRAM scheduling (80–95% utilization across 10–50 runs)[cite: 3].
+  * Designed and implemented the PyBullet simulation experiments for *Relational DeepSym*. 
+  * Co-developed a discrete self-attention block using Gumbel-Sigmoid activations to extract sparse relational adjacency matrices ($$A \in \{0, 1\}^{N \times N}$$) to serve as relational symbols alongside object properties. 
+  * Built an automated experimentation pipeline with WandB cloud integration to manage concurrent VRAM scheduling (80–95% utilization across 10–50 runs).
 
   [Publication Page](/projects/2023-relational)
 
-* **Intrinsic Curiosity for Deep Symbolic Learning (B.S. Thesis):** 
-  * Conceived and developed an active exploration framework to solve Relational DeepSym's 1M-sample data bottleneck[cite: 6]. 
-  * Utilized a 5-member ensemble disagreement council over 5-step lookahead horizons to measure epistemic uncertainty.
-  * Outperformed random exploration baselines by up to **10% in planning accuracy** and matched its performance while using **23% fewer** training samples[cite: 6].
+* **Intrinsic Curiosity for Deep Symbolic Learning (B.S. Thesis):** Designed an active exploration framework using 5-member ensemble disagreement over 5-step lookahead horizons, improving planning accuracy by 10% at equal sample size — full write-up under Selected Projects.
 * **Lab Leadership:** Organized weekly research seminars, managed local GPU server infrastructure, and mentored incoming students in deep learning and experimental design.
 
-[Project Page](/projects/intrinsic_curiosity)
+
 
 ---
 
 ## Selected Projects
 
-### **Intrinsic Curiosity for Deep Symbolic Robot Learning** *(B.S. Senior Thesis)*[cite: 6]
-* **Motivation & Method:** Replaced uniform random sampling in [Relational DeepSym](/projects/2023-relational) with an epistemic uncertainty reward computed via covariance matrices across a forward-dynamics prediction ensemble[cite: 6].
-* **Key Results:** Achieved higher planning accuracy ($0.58$ vs. $0.52$) with $39\text{k}$ samples compared to a $51\text{k}$-sample random baseline[cite: 6]. Uncovered complex emergent behaviors—including convoluted symbol manipulation and unprogrammed rotation primitives via controlled collapses[cite: 6].
+### **Intrinsic Curiosity for Deep Symbolic Robot Learning** *(B.S. Senior Thesis)*
+* **Motivation & Method:** Replaced uniform random exploration in [Relational DeepSym](/projects/2023-relational) framework with an epistemic uncertainty reward computed via covariance matrices across a forward-dynamics prediction ensemble.
+* **Key Results:** In a data-constrained regime, improved planning accuracy from **52% to 62%** over the random-exploration baseline at matched sample size (51k). Using 23% fewer samples (39k vs. 51k), the curiosity-driven policy still reached 58% — exceeding the baseline's 51k-sample accuracy despite using less data. Further inspection revealed complex emergent behaviors — including convoluted symbol manipulation and unprogrammed rotation primitives via controlled collapses.
 
-### **FPGA Design Space Exploration via Constraint-Aware Genetic Algorithms** *(CMPE583 Project)*[cite: 5]
-* **Methodology:** Modeled non-convex High-Level Synthesis (HLS) design parameter search in Vitis HLS as an integer-boolean evolutionary optimization problem[cite: 5]. Direct-mapped synthesis pragmas (array partitioning, loop unrolling, pipelining) into chromosome representations[cite: 5].
-* **System Design & Optimization:** Implemented a selection rule enforcing candidate boundary oscillation along strict resource constraints ($8,000$ LUTs) and engineered a Python-Tcl controller managing parallel HLS compilation instances[cite: 5]. Successfully mapped the Pareto frontier between latency and LUT utilization[cite: 1, 5].
+> Please see the qualitative inspection at the [Project Page](/projects/intrinsic_curiosity)
 
-### **Autonomous RC Vehicle Architecture** *(1st Place – CMPE443 Competition)*[cite: 1]
-* Programmed bare-metal C firmware on STM32 Nucleo-144 boards via direct register manipulation without HAL dependencies[cite: 1].
-* Optimized hardware execution profiles for real-time sensor processing while balancing energy consumption against motor speeds[cite: 1].
+### **Human-to-Robot Motion Transfer (Blending-CNMPs):**
+  * **Motivation:** Extended the Blending-CNMP architecture, which focused on robot-to-robot skill transfer, to a human-in-the-loop setup.
+  * **Method:** Captured human demonstrations via an Intel RealSense camera and MediaPipe 3D tracking, then diagnosed the CNMP encoder's sensitivity to the resulting low-frequency drift — distinct from the high-frequency jitter it was originally designed to tolerate.
+  * Designed a trajectory filtering and normalization pipeline to suppress this drift, achieving cross-embodiment **Cartesian-to-joint-space motion transfer** to the Torobo manipulator with a **~3 cm** end-effector accuracy.
+
+[Project Page](/projects/correspondence_learning) with demonstrations.
+
+### **FPGA Design Space Exploration via Constraint-Aware Genetic Algorithms** *(CMPE583 Reconfigurable Computing Term Project)*
+* **Methodology:** Modeled non-convex High-Level Synthesis (HLS) design parameter search in Vitis HLS as an integer-boolean optimization problem. Conceived evolutionary algorithms as the only method to tackle it. Direct-mapped synthesis pragmas (array partitioning, loop unrolling, pipelining) into chromosome representations.
+
+* **System Design & Optimization:** Implemented a selection rule enforcing candidate boundary oscillation along strict resource constraints ($$8,000$$ LUTs) and engineered a Python-Tcl controller managing parallel HLS compilation instances. **Successfully mapped the Pareto frontier** between latency and LUT utilization.
+
+[Project Page](/projects/evolutionary).
+
+### **Autonomous RC Vehicle Architecture** *(1st Place – CMPE443 Competition)*
+* Programmed bare-metal C firmware on STM32 Nucleo-144 boards via direct register manipulation without HAL dependencies.
+* Optimized hardware execution profiles for real-time sensor processing while balancing energy consumption against motor speeds.
 
 ---
 
