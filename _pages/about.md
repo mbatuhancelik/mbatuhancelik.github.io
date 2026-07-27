@@ -45,12 +45,12 @@ My internship at SISReC served as my gateway to cognitive and developmental lear
 
 ### 🛠️ Beyond the Lab
 
-* **Mathematical Modeling & Systems:** Building and exploring mathematical models and optimization pipelines across diverse domains—from biology and physics to economics and sociology.
+* **Mathematical Modeling & Systems:** Building and exploring mathematical models and optimization pipelines across diverse domains — from biology and physics to economics and sociology.
 * **Social Sciences:** Deeply interested in history and psychology, with a focus on economics and societal structures from the ancient era to today.
-* **Debate:** Active in university debate discussions, enjoying structured argumentation and policy analysis as a long-time hobby.
-* **Self-Directed Pursuits:** Self-taught in electric guitar and chess. I also self-studied Japanese before taking formal advanced coursework under Yuriko Öncü at Boğaziçi.
+* **Debate:** Active in university debate discussions, enjoying structured argumentation and critical thinking.
+* **Self-Directed Pursuits:** Self-taught in electric guitar and chess. I also self-studied Japanese before taking formal coursework under Yuriko Öncü at Boğaziçi University.
 * **Systems & Tooling:** Daily-driving **Fedora Linux**, custom-tailoring my computer from firmware to GUI.
 
 ---
 
-*Feel free to reach out via [Email](mailto:batuhancelik.boun@gmail.com), [LinkedIn](https://www.linkedin.com/in/mehmet-batuhan-%C3%A7elik-9a8795172), or explore my website!*
+*Feel free to reach out via [Email](mailto:batuhancelik.boun@gmail.com)*
