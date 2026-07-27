@@ -7,7 +7,7 @@ date: 28.08.2023
 excerpt: 'Extending the Blending-CNMP framework to noisy, vision-based human demonstrations — bridging the embodiment and Cartesian-to-joint-space gap to transfer reaching skills between a human and the Torobo manipulator.'
 ---
 
-> **Note:** This is an independent project extending Aktaş et al. (2023). I am **not an author** on that paper — see [Context](#context) below.
+> **Note:** This is an independent project extending [Aktaş et al. (2023)](https://arxiv.org/abs/2310.13458). I am **not an author** on that paper — see [Context](#context) below.
 
 
 ## Abstract
@@ -30,7 +30,7 @@ The core foundation of this project builds directly upon the Blending-CNMP frame
 
 <div style="text-align: center; margin: 20px auto; max-width:100%;">
 <img src="/images/blending_cnmp_arch.png" alt="Blending-CNMP Architecture Overview" style="width:95%; display:block; margin:20px auto;">
-  <p style="font-style: italic; color: #666; margin-top: 8px;">Figure: Blending-CNMP architecture mapping conditional observations from diverse morphologies into a shared representation space.</p>
+  <p style="font-style: italic; color: #666; margin-top: 8px;">Figure: Blending-CNMP architecture mapping conditional observations from diverse morphologies into a shared representation space. Taken from <a href="https://arxiv.org/abs/2310.13458">(Aktaş et al. 2023)</a></p>
 </div>
 
 As illustrated above, sparse conditional observations from each agent's trajectory ($$S^A_t$$ and $$S^B_t$$) are passed through agent-specific encoders ($$E^A$$ and $$E^B$$) and aggregated to produce distinct latent vectors $$L^A$$ and $$L^B$$. These latents are subsequently combined into a single, unified shared representation space ($$L$$) via a randomly-weighted convex combination using a blending parameter $$p$$ sampled uniformly during training:
