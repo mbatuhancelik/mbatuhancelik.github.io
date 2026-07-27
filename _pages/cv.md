@@ -26,23 +26,25 @@ I work on neurosymbolic approaches to robot learning — extracting symbolic, co
 
 ### **Boğaziçi University** | *Istanbul, Turkey*
 **B.S. in Computer Engineering** | **GPA:** 3.68 / 4.00
-*Sept 2018 – Dec 2024*
+*Sept 2018 – Jan 2025*
 * **Relevant Coursework:** Deep Learning in Robotics, Machine Learning, Parallel Algorithms, Advanced Theoretical Computer Science, Reconfigurable Computing, Quantum Algorithms.
-* **Honors:** Ranked **517th** among 2.5 million students nationwide in the Turkish Higher Education Foundations Examination.
+* **Honors:** Ranked **517th** among 2.3 million students nationwide in the Turkish Higher Education Foundations Examination.
 
 ---
 
 ## Publications
 
 ### Journal Articles
-* **Discovering Predictive Relational Object Symbols with Symbolic Attentive Layers**
-  Alper Ahmetoglu, **Batuhan Celik**, Erhan Oztop, Emre Ugur
-  *IEEE Robotics and Automation Letters (RA-L)*, Feb 2024. [DOI: 10.1109/LRA.2024.3350994](https://doi.org/10.1109/LRA.2024.3350994)
+* **Discovering Predictive Relational Object Symbols with Symbolic Attentive Layers**\
+   Alper Ahmetoglu, **Batuhan Celik**, Erhan Oztop, Emre Ugur\
+  *IEEE Robotics and Automation Letters (RA-L)*, Feb 2024. \
+  [DOI: 10.1109/LRA.2024.3350994](https://doi.org/10.1109/LRA.2024.3350994)
 
 ### Conference Proceedings
-* **Developmental Scaffolding with Large Language Models**
-  **Batuhan Celik**, Alper Ahmetoglu, Emre Ugur, Erhan Oztop
-  *IEEE International Conference on Development and Learning (ICDL)*, Aug 2023. [DOI: 10.1109/ICDL55364.2023.10364374](https://doi.org/10.1109/ICDL55364.2023.10364374)
+* **Developmental Scaffolding with Large Language Models**\
+  **Batuhan Celik**, Alper Ahmetoglu, Emre Ugur, Erhan Oztop\
+  *IEEE International Conference on Development and Learning (ICDL)*, Aug 2023.\
+  [DOI: 10.1109/ICDL55364.2023.10364374](https://doi.org/10.1109/ICDL55364.2023.10364374)
 
 ---
 
@@ -67,7 +69,7 @@ I work on neurosymbolic approaches to robot learning — extracting symbolic, co
 * **Discovering Predictive Relational Object Symbols (RA-L 2024):**
   * Designed and implemented the PyBullet simulation experiments for *Relational DeepSym*.
   * Co-developed a discrete self-attention block using Gumbel-Sigmoid activations to extract sparse relational adjacency matrices ($$A \in \{0, 1\}^{N \times N}$$) to serve as relational symbols alongside object properties.
-  * Built an automated experimentation pipeline with WandB cloud integration to manage concurrent VRAM scheduling (80–95% utilization across 10–50 runs).
+  * Built an automated experimentation pipeline with WandB cloud integration to manage concurrent VRAM scheduling (80–95% utilization across 10–50 runs) to accelerate hyperparameter tuning and multi-seed evaluation.
 
   [Publication Page](/projects/2023-relational).
 
@@ -79,7 +81,7 @@ I work on neurosymbolic approaches to robot learning — extracting symbolic, co
 ## Selected Projects
 
 ### **Intrinsic Curiosity for Deep Symbolic Robot Learning** *(B.S. Senior Thesis)*
-* **Motivation & Method:** Replaced uniform random exploration in [Relational DeepSym](/projects/2023-relational) framework with an epistemic uncertainty reward computed via covariance matrices across a forward-dynamics prediction ensemble.
+* **Motivation & Method:** Replaced uniform random exploration in [Relational DeepSym](/projects/2023-relational) framework with an epistemic uncertainty reward computed via covariance matrices across a forward-dynamics prediction ensemble to tackle **1M sample size** data bottleneck in the original paper.
 * **Key Results:** In a data-constrained regime, improved planning accuracy from **52% to 62%** over the random-exploration baseline at matched sample size (51k). Using 23% fewer samples (39k vs. 51k), the curiosity-driven policy still reached 58% — exceeding the baseline's 51k-sample accuracy despite using less data. Further inspection revealed complex emergent behaviors — including convoluted symbol manipulation and unprogrammed rotation primitives via controlled collapses.
 
   [Project Page](/projects/intrinsic_curiosity) with qualitative inspection.
@@ -164,6 +166,7 @@ I work on neurosymbolic approaches to robot learning — extracting symbolic, co
 
 * **STAR Undergraduate Research Scholarship** — TÜBİTAK (Scientific and Technological Research Council of Turkey), awarded for the "Discovering Predictive Relational Object Symbols with Symbolic Attentive Layers" study.
 * **Ethics in Academia Delegate** — Selected participant, Bilkent University symposium on academic ethics with Nobel Laureate Aziz Sancar (2016).
+
 ---
 ## Service
 
