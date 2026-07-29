@@ -95,6 +95,7 @@ The framework was benchmarked against our previous symbol discovery baselines ac
    author={Ahmetoglu, Alper and Celik, Batuhan and Oztop, Erhan and Ugur, Emre},
    year={2024},
    month=Feb, pages={1977–1984} }
+```
 
 <style>
   /* Reduce side padding for the main content area */
