@@ -102,4 +102,4 @@ The GA successfully explored the trade-off space to locate low-latency, hardware
 
 ## Disclaimer
 
-Upon our initial success at this term project this endevour evolved into a research effort under supervision of Prof. Arda Yurdakul which I initially contributed to. However, as its work coincided with my summer internship at SISREC, Osaka University, I had to hand-off this work to my collegue Ilgaz Er.
+Upon our initial success at this term project this endeavor evolved into a research effort under supervision of Prof. Arda Yurdakul which I initially contributed to. However, as its work coincided with my summer internship at SISREC, Osaka University, I had to hand off this work to my colleague Ilgaz Er.
