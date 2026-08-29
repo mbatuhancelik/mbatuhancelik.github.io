@@ -71,7 +71,7 @@ I work on neurosymbolic approaches to robot learning — extracting symbolic, co
   * Co-developed a discrete self-attention block using Gumbel-Sigmoid activations to extract sparse relational adjacency matrices ($$A \in \{0, 1\}^{N \times N}$$) to serve as relational symbols alongside object properties.
   * Built an automated experimentation pipeline with WandB cloud integration to manage concurrent VRAM scheduling (80–95% utilization across 10–50 runs) to accelerate hyperparameter tuning and multi-seed evaluation.
 
-  [Publication Page](/projects/2023-relational).
+  [Publication Page](/publication/2023-relational).
 
 * **Intrinsic Curiosity for Deep Symbolic Learning (B.S. Thesis):** Designed an active exploration framework using 5-member ensemble disagreement over 5-step lookahead horizons, improving planning accuracy by 10% at equal sample size — full write-up under Selected Projects.
 * **Lab Leadership:** Organized weekly research seminars, managed local GPU server infrastructure, and mentored incoming students in deep learning and experimental design.
@@ -81,7 +81,7 @@ I work on neurosymbolic approaches to robot learning — extracting symbolic, co
 ## Selected Projects
 
 ### **Intrinsic Curiosity for Deep Symbolic Robot Learning** *(B.S. Senior Thesis)*
-* **Motivation & Method:** Replaced uniform random exploration in [Relational DeepSym](/projects/2023-relational) framework with an epistemic uncertainty reward computed via covariance matrices across a forward-dynamics prediction ensemble to tackle **1M sample size** data bottleneck in the original paper.
+* **Motivation & Method:** Replaced uniform random exploration in [Relational DeepSym](/publication/2023-relational) framework with an epistemic uncertainty reward computed via covariance matrices across a forward-dynamics prediction ensemble to tackle **1M sample size** data bottleneck in the original paper.
 * **Key Results:** In a data-constrained regime, improved planning accuracy from **52% to 62%** over the random-exploration baseline at matched sample size (51k). Using 23% fewer samples (39k vs. 51k), the curiosity-driven policy still reached 58% — exceeding the baseline's 51k-sample accuracy despite using less data. Further inspection revealed complex emergent behaviors — including convoluted symbol manipulation and unprogrammed rotation primitives via controlled collapses.
 
   [Project Page](/projects/intrinsic_curiosity) with qualitative inspection.
@@ -107,8 +107,8 @@ I work on neurosymbolic approaches to robot learning — extracting symbolic, co
 ## Talks & Presentations
 
 * **Developmental Scaffolding with Large Language Models**
-  * Invited talk, NAIST Robot Learning Lab, 2023.
-  * Invited talk, ROYAL Group, Boğaziçi University, 2023.
+  * Lab-exchange presentation, NAIST Robot Learning Lab, 2023.
+  * Poster presentation, ROYAL Group, Boğaziçi University, 2023.
 * Weekly paper presentations on NSCL and PaLM-E, CoLoRs Lab reading group, 2022–2024.
 
 ---

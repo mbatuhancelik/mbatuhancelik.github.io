@@ -103,9 +103,9 @@ The study provides a stress test of **embodied comprehension of LLMs**. While mo
 
 - **Uncovered systemic structural hallucinations within GPT-3.5's physical world planning models**, validating semantic failure modes via targeted exploratory tasks.
 
-- **Prepared the first draft and implemented alterations of my collegues**, presenting my work and literature review while ensuring a coherent manuscript using my 2 professor's inputs.
+- **Prepared the first draft and implemented alterations from my colleagues**, presenting my work and literature review while ensuring a coherent manuscript using my 2 professors' inputs.
 
-- **Took corresponding author responsilibities**, answered reviews of the ICDL comitee and performed necessary changes on the final draft. 
+- **Took corresponding author responsibilities**, answered reviews of the ICDL committee and performed necessary changes on the final draft. 
 
 ## 📊 Experimental Results
 
@@ -146,7 +146,7 @@ We benchmarked the LLM-guided scaffolding framework against a **baseline random 
 <div style="display: flex; align-items: center; justify-content: space-between; gap: 2rem; margin: 2rem 0; flex-wrap: wrap; direction: rtl;">
   <div style="flex: 1; min-width: 320px; direction: ltr;">
     <p>
-      We observed that changing a <b>single word</b> in the prompts could yielded dramatic changes in behaviour.
+      We observed that changing a <b>single word</b> in the prompts could yield dramatic changes in behaviour.
     </p>
     <p>
       Changing the word <b><u>interesting</u></b> to <b><u>novel</u></b> significantly decreased the average tower height.
@@ -167,7 +167,7 @@ We benchmarked the LLM-guided scaffolding framework against a **baseline random 
 
 ### 3. Different Affordances
 
-When **spheres are introduced** to the environment, GPT's grounding vulnerabilities become apparent. Even under explicit instructions to maximize stack height, the presence of a sphere led to a performance degradation. Qualitative analysis confirmed that the model repeatedly hallucinated the sphere as a stable base. The assistants answer bellow provides an illustration.
+When **spheres are introduced** to the environment, GPT's grounding vulnerabilities become apparent. Even under explicit instructions to maximize stack height, the presence of a sphere led to a performance degradation. Qualitative analysis confirmed that the model repeatedly hallucinated the sphere as a stable base. The assistant's answer below provides an illustration.
 
 <pre><code>[Assistant]: The best action would be to put the blue cube on top of the red sphere.
 This is because</code> <code><b>**the red sphere can provide a stable base for the cube, and the cube can sit 
@@ -200,7 +200,7 @@ securely on top of the sphere**.</b></code></pre>
 
 ### Future Work
 
-The gap between early text-only models and modern vision-language-action models (VLMs/VLAMs) is profound—particularly regarding embodied knowledge. By integrating direct visual peripherals, modern multi-modal architectures transcend the limitations of text, allowing the system to perceive spatial geometry, self-affordances, and physical constraints. **This sensory grounding fundamentally improves the model's grasp of embodied knowledge**. Re-evaluating developmental parental scaffolding concepts through the lens of these multimoodal foundation models offers a highly promising path toward establishing practical, robust, and self-correcting exploration loops in complex environments.
+The gap between early text-only models and modern vision-language-action models (VLMs/VLAMs) is profound—particularly regarding embodied knowledge. By integrating direct visual peripherals, modern multi-modal architectures transcend the limitations of text, allowing the system to perceive spatial geometry, self-affordances, and physical constraints. **This sensory grounding fundamentally improves the model's grasp of embodied knowledge**. Re-evaluating developmental parental scaffolding concepts through the lens of these multimodal foundation models offers a highly promising path toward establishing practical, robust, and self-correcting exploration loops in complex environments.
 
 
 ### BibTeX

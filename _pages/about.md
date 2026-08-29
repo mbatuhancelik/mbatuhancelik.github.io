@@ -9,7 +9,7 @@ redirect_from:
 
 I am an incoming graduate applicant and prospective researcher focusing on **representation learning, causal structures, and active learning** from a cognitive science viewpoint. 
 
-I recently graduated with a B.S. in Computer Engineering from Boğaziçi University (GPA: **3.68**/4.0), where I worked extensively as an undergraduate researcher at the **Cognitive Learning and Robotics Lab (CoLoRs)** under the supervision of **Dr. Alper Ahmetoğlu and Prof. Emre Uğur** while completing a research internship at Osaka University's **Symbiotic Intelligent Systems Research Center (SISReC)** under **Prof. Erhan Öztop**.
+I recently graduated with a B.S. in Computer Engineering from Boğaziçi University (GPA: **3.68**/4.0), where I worked extensively as an undergraduate researcher at the **Cognitive Learning and Robotics Lab (CoLoRs)** under the supervision of **Dr. Alper Ahmetoğlu and Prof. Emre Uğur** while completing a research internship at Osaka University's **Symbiotic Intelligent Systems Research Center (SISReC)** under **Prof. Erhan Öztop**. I extended my time as an undergraduate beyond the standard duration by choice, prioritizing sustained research involvement across these labs over a faster degree completion.
 
 My work previously centered on self-learning structured, interpretable, and expandable representations from continuous sensorimotor data to enable manipulation and long-term planning. Meanwhile, I leveraged active learning to scale up task complexity. 
 
