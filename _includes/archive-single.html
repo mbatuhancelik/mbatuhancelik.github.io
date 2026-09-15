@@ -59,9 +59,11 @@
     <p class="archive__item-excerpt" itemprop="description"><p>{{ post.excerpt | markdownify | remove: '<p>' | remove: '</p>' }}<strong><a href="{{ base_path }}{{ post.url }}" rel="permalink"> Read more</a></strong></p></p>
     {% endif %}
     {% if post.header.video_teaser %}
+  {% assign video_poster = post.header.video_teaser | replace: ".mp4", "_poster.jpg" %}
   <div class="archive__item-teaser" style="position:relative; width:100%;">
-    <video autoplay loop muted playsinline width="100%" style="display:block; object-fit:cover;">
-      <source src="{{ post.header.video_teaser | relative_url }}" type="video/mp4">Your browser does not support the video tag.
+    <video autoplay loop muted playsinline width="100%" poster="{{ video_poster | relative_url }}" style="display:block; object-fit:cover;">
+      <source src="{{ post.header.video_teaser | relative_url }}" type="video/mp4">
+      Your browser cannot play this video. <a href="{{ post.header.video_teaser | relative_url }}">Download it here.</a>
     </video>
   </div>
 {% else %}

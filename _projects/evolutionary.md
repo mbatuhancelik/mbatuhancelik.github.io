@@ -2,13 +2,16 @@
 title: "FPGA Design Optimization using Genetic Algorithms"
 collection: projects
 excerpt: "Automating High-Level Synthesis (HLS) design space exploration using a custom, constraint-aware genetic algorithm on a non-convex, integer-boolean search space."
-venue: "CMPE583 (Reconfigurable Programming) Term Project"
-date: 05.06.2023
+venue: "CMPE583 (Reconfigurable Computing) Term Project"
+date: 2023-06-05
+description: "Course term project: framing FPGA high-level-synthesis design space exploration as constrained integer-boolean optimization, and solving it with a genetic algorithm that oscillates along the LUT resource boundary."
 ---
 
 Design parameter optimization in FPGA programming is a **non-convex, high-dimensional, integer-boolean optimization problem**. Because closed-form mathematical solutions do not exist for compiler-driven hardware generation, industrial FPGA designs are traditionally tuned through trial, error, and designer intuition. 
 
-In this project, developed with **Ilgaz Er** for *CMPE583: Reconfigurable Programming* (taught by Prof. Arda Yurdakul), we frame FPGA Design Space Exploration (DSE) as an automated integer-boolean optimization process. We built a custom, constraint-aware **Genetic Algorithm (GA)** that maps Vitis HLS synthesis pragmas directly into design genomes, navigating the non-convex trade-off space under strict hardware constraints.
+In this project, developed with **Ilgaz Er** for *CMPE583: Reconfigurable Computing* (taught by Prof. Arda Yurdakul), we frame FPGA Design Space Exploration (DSE) as an automated integer-boolean optimization process. We built a constraint-aware genetic algorithm that maps Vitis HLS synthesis pragmas directly into design genomes, navigating the non-convex trade-off space under strict hardware constraints.
+
+*The code is not public: the same repository is used for a research project this project initiated and preserved as the private repo for that project.*
 
 ---
 
@@ -17,16 +20,16 @@ In this project, developed with **Ilgaz Er** for *CMPE583: Reconfigurable Progra
 * **Genome-Pragma Encoding:** Direct mapping of array partitioning factors, partition types, loop unrolling factors, and pipelining flags into dependent chromosomes.
 * **Constraint-Boundary Oscillation:** A specialized selection rule that excludes infeasible offspring derived from already-infeasible parents, forcing the population to bounce along—rather than drift away from—the feasible resource boundary.
 * **Binomial Directional Mutation:** Uses binomial distributions over uniform or Gaussian noise to preserve gene structure while biasing local search space exploration.
-* **Parallel Orchestration Engine:** A Python controller running multiple Vitis HLS instances via Tcl scripts in parallel, complete with automatic 10-minute timeout management.
+* **Parallel evaluation:** A Python controller that runs multiple Vitis HLS instances in parallel via Tcl scripts, with a 10-minute timeout per synthesis run.
 
 ---
 
 ## Problem Definition & Motivation
 
-Standard mathematical optimization approaches (such as Simplex, MaxSAT, or Gradient Descent) fail in HLS Design Space Exploration due to several core domain challenges:
+Standard mathematical optimization approaches — linear programming, gradient-based methods, and SAT/SMT-based formulations — are poorly suited to HLS design space exploration for several reasons. (SAT- and SMT-based DSE is a real line of work in this field; the objection below is to the cost of building a faithful model, not to the technique.)
 
 1. **No Closed Cost Model:** Vitis HLS internal compiler heuristics are proprietary, preventing the construction of an analytical cost function.
-2. **Non-Convexity & High-Frequency Noise:** The search space is discrete, non-convex, and noisy. Small parameter shifts (e.g., changing a loop unroll factor from 2 to 3) can drastically alter pipeline depth or resource instantiation.
+2. **Non-Convexity:** The search space is discrete and non-convex. Small parameter shifts — changing a loop unroll factor from 2 to 3 — can change pipeline depth or resource instantiation substantially.
 3. **Inter-Dependent Boolean Logic:** Pragmas do not act independently; enabling a pipelining flag can change how array partitioning pragmas are mapped into block RAM vs. registers at the register-transfer level (RTL).
 4. **Combinatorial Explosion:** Code bases with multiple loops, array accesses, and function calls generate huge combinatorial spaces when pragmas are applied across every block.
 5. **High Synthesis Overhead:** Evaluating a single design candidate requires full HLS compilation to extract exact resource and latency metrics. Because each run takes several minutes, brute-force or greedy searches are computationally intractable.
@@ -40,7 +43,7 @@ Standard mathematical optimization approaches (such as Simplex, MaxSAT, or Gradi
 
 * **Genome Representation:** Directly encodes synthesis pragmas into dependent chromosomes. Array partitioning maps to partition type and factor, while loop pragmas map to pipeline booleans and unroll factors.
 * **Binomial Mutation:** Replaces standard Gaussian/uniform noise with a binomial distribution. This maintains local variance while actively biasing mutation in a specific search direction.
-* **Selection & Boundary Control:** Keeps the top $2p$ parents across generations (retired after 5 generations). To prevent drift into invalid spaces, offspring derived from an infeasible parent are immediately excluded if they remain infeasible.
+* **Selection & Boundary Control:** Keeps the top $2p$ candidates as carried-over parents, where $p$ is the per-generation survivor count listed in the [population profiles](#population-profiles) below; each is retired after five generations. To prevent drift into invalid regions, offspring derived from an infeasible parent are excluded if they remain infeasible.
 * **Population Merging:** Periodically combines independently converged populations by breeding their top candidates to test for cross-population synergy.
 
 
@@ -70,36 +73,40 @@ To stress-test the algorithm's ability to operate under tight hardware limits, w
 
 ## Results & Pareto Frontier Exploration
 
-The GA successfully explored the trade-off space to locate low-latency, hardware-feasible candidates. However, evolutionary dynamics varied across runs: **Population 1** hit a local optimum early and stagnated, while **Population 2** dynamically oscillated across the resource limit before settling on a high-performing point.
+Both populations improved substantially and both stayed inside the resource budget — Population 1 from roughly 148k to 62,465 cycles by generation 24, Population 2 from roughly 231k to 64,001 by generation 20. They arrived at comparable latency by different routes, converging on distinct local optima rather than rediscovering the same design: Population 1 climbed steadily, while Population 2 oscillated across the resource limit before settling. That the two runs land close on latency but differ in their pragma configurations indicates both discovered different sections of the Pareto Frontier. This urged us to merge these populations.
 
 ### Performance Metrics Across Generations
 
 | Population Profile | Generation | Latency (Cycles) | LUT Usage (%) | Status |
 | :--- | :---: | :---: | :---: | :--- |
-| **Population 1** | Gen 0 | 148,481 | 72.6% | Feasible |
-| **Population 1** | Gen 0 | 144,385 | 70.5% | Feasible (Stagnated) |
+| **Population 1** | Gen 0, seed 1 | 148,481 | 72.6% | Feasible |
+| **Population 1** | Gen 0, seed 2 | 144,385 | 70.5% | Feasible |
 | **Population 1** | **Gen 24** | **62,465** | **77.2%**| Feasible (Stagnated) |
-| **Population 2** | Gen 0 | 231,425 | 67.9% | Feasible |
-| **Population 2** | Gen 0 | 149,153 | 95.3% | Feasible |
+| **Population 2** | Gen 0, seed 1 | 231,425 | 67.9% | Feasible |
+| **Population 2** | Gen 0, seed 2 | 149,153 | 95.3% | Feasible |
 | **Population 2** | **Gen 20** | **64,001** | **79.5%** | **Optimal Feasible** |
 | **Merged Pop.** | Gen 9 | 62,977 | 86.7% | Feasible |
 | **Merged Pop.** | Gen 15 | *46,081* | *180.0%* | **Infeasible (Resource Breach)** |
 
+Each population was initialized twice from independent random seeds; the two Gen 0 rows are those two starting points. The 180% in the last row is a Vitis HLS resource *estimate* — what the design would require, not what was placed — so that candidate cannot be synthesized onto this board. It is still the fastest design the search found, by a wide margin — see the discussion below for why that matters.
+
 <div style="text-align: center; margin: 20px auto; max-width:100%;">
-<img src="/images/population2_lineage.png" alt="Blending-CNMP Architecture Overview" style="width:95%; display:block; margin:20px auto;">
-  <p style="font-style: italic; color: #666; margin-top: 8px;">Family tree of Population 2's top candidate over 5 generations, numbers of the dots indicate the individual design's generation.</p>
+<img src="/images/population2_lineage.png" alt="Family tree of Population 2's best candidate: nodes are individual designs labelled by generation, edges show parent-offspring relationships, and infeasible parents are marked" style="width:95%; display:block; margin:20px auto;">
+  <p style="font-style: italic; color: #666; margin-top: 8px;">Family tree of Population 2's best candidate, spanning the five generations that produced it. The number on each node is that individual's generation.</p>
 </div>
 
-> **Lineage detail**: The inclusion of an infeasible parent at Generation 23 demonstrates the search strategy in action. The algorithm intentionally explores near the 8,000 LUT constraint to uncover high-performing, feasible designs.
+> **Lineage detail**: An infeasible parent appears in this lineage, which is the selection rule working as intended — the algorithm deliberately searches close to the 8,000 LUT constraint, and candidates that cross it can still produce feasible, high-performing offspring.
 
 ---
 
 ## Key Takeaways & Discussion
 
-1. **Intra-Population Optimization:** Single-population runs successfully discovered coupled hardware patterns—such as matching a loop's unroll factor directly to an array's partition factor.
-2. **The Population Merging Bottleneck:** Breeding independently-converged populations did not reliably improve upon parent optima. Combining distant local optima, both populations evolved different strategies, frequently broke co-adapted gene complexes. While this variation yielded high utilization of the hardware, 180% LUT utilization in generation 15, it did not converge to a feasible optima in **10 generations**.
-3. **Future Directions:** Moving beyond baseline GAs, future work will integrate more advanced evolutionary algorithms, such as **NSGA-II**, to preserve Pareto front diversity and explore explicit inter-gene dependency modeling to guide directional mutations.
+1. **Within a population, the GA finds coupled parameters.** Single-population runs discovered hardware patterns that depend on two pragmas agreeing — matching a loop's unroll factor to the partition factor of the array it reads, for instance — which is the kind of interaction a coordinate-wise search misses.
+2. **Merging populations combined their strategies, and hit the device rather than the algorithm.** The two populations had converged on different approaches to parallelizing the kernel. Crossing them produced offspring that inherited both, and the combination was genuinely faster: the generation-15 candidate runs in **46,081 cycles against roughly 62,000 for the better parent**, a 26% latency reduction. It is also infeasible on this board, needing 180% of the device's LUTs — combining two parallelization strategies costs roughly the sum of their resources, and the budget was already tight.
+
+    This is a useful result rather than a failed one. The merged run maps a point on the latency–resource frontier that lies beyond the target device, which is exactly the information a designer needs when choosing hardware: it says what a larger FPGA would buy, and quantifies it. The binding constraint here is the 8,000-LUT budget of the `xc7s15`, not the search.
+3. **Future Directions:** Moving beyond a baseline GA, the obvious next steps are a multi-objective algorithm such as **NSGA-II** to preserve Pareto-front diversity, and explicit modelling of inter-gene dependencies to guide directional mutation.
 
 ## Disclaimer
 
-Upon our initial success at this term project this endeavor evolved into a research effort under supervision of Prof. Arda Yurdakul which I initially contributed to. However, as its work coincided with my summer internship at SISREC, Osaka University, I had to hand off this work to my colleague Ilgaz Er.
+After the term project succeeded, the work continued as a research effort under Prof. Arda Yurdakul. I contributed to that initial continuation, but handed it off to my colleague Ilgaz Er as it overlapped with my summer internship at SISReC, Osaka University.

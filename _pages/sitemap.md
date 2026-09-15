@@ -3,6 +3,8 @@ layout: archive
 title: "Sitemap"
 permalink: /sitemap/
 author_profile: true
+sitemap: false
+description: "Index of every page on Batuhan Çelik's academic site."
 ---
 
 {% include base_path %}

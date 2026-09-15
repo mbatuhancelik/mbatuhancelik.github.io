@@ -4,30 +4,27 @@ collection: publications
 category: conferences
 authors: "<b>Batuhan Çelik</b>, Alper Ahmetoğlu, Emre Uğur, Erhan Öztop"
 permalink: /publication/2023-icdl-scaffolding
-date: 2023-10-02
+date: 2023-11-09
 venue: 'IEEE International Conference on Development and Learning (ICDL)'
-paperurl: "https://arxiv.org/abs/2309.00904"
+paperurl: "https://arxiv.org/pdf/2309.00904"
+description: "ICDL 2023. Can an LLM act as a parental scaffolding agent for a robot learning to predict its own action effects? GPT-3.5 guidance finds novel structures faster than random exploration, but fails on objects whose affordances differ from cubes."
 ---
 
 ### Abstract
 Exploration and self-observation are key mechanisms of infant sensorimotor development. These processes are further guided by parental scaffolding to accelerate skill and knowledge acquisition. In developmental robotics, this approach has been adopted often by having a human acting as the source of scaffolding. In this study, we investigate whether Large Language Models (LLMs) can act as a scaffolding agent for a robotic system that aims to learn to predict the effects of its actions. To this end, an object manipulation setup is considered where one object can be picked and placed on top of or in the vicinity of another object. The adopted LLM is asked to guide the action selection process through algorithmically generated state descriptions and action selection alternatives in natural language. The simulation experiments that include cubes in this setup show that LLM-guided (GPT3.5-guided) learning yields significantly faster discovery of novel structures compared to random exploration. However, we observed that GPT3.5 fails to effectively guide the robot in generating structures with different affordances such as cubes and spheres. Overall, we conclude that even without fine-tuning, LLMs may serve as a moderate scaffolding agent for improving robot learning, however, they still lack affordance understanding which limits the applicability of the current LLMs in robotic scaffolding tasks.
 
-[arXiv](https://arxiv.org/abs/2309.00904), [IEEExplore](https://ieeexplore.ieee.org/document/10364374)
+[arXiv](https://arxiv.org/abs/2309.00904) · [IEEE Xplore](https://ieeexplore.ieee.org/document/10364374)
 
 <!-- more -->
 
-## 📺 Exploration & Interactive Breakdown
-
-This study investigates how a Large Language Model can be leveraged as an automated scaffolding agent to guide high-level robot exploration toward hard-to-reach, structurally complex, or statistically improbable physical arrangements. This framework is proposed as an algorithmic solution to **achieve high throughput scaffolding while probing grounded inference capabilities of available LLMs**.
-
-*Note: LLM capabilities have progressed significantly since the publication of this work during the GPT-3.5 era. The results documented below serve as an foundational benchmark of early text-only reasoning models applied to physical scaffolding.*
+First author and corresponding author, CoLoRs Lab, Boğaziçi University.
 
 <div style="text-align: center; margin: 2rem 0; width: 100%;">
   <iframe 
     width="100%" 
     height="640" 
     src="https://www.youtube.com/embed/qLTS8Pt-7Ks" 
-    title="Developmental Scaffolding with Large Language Models: Demonstration video" 
+    title="Developmental Scaffolding with Large Language Models: demonstration video" 
     frameborder="0" 
     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
     referrerpolicy="strict-origin-when-cross-origin" 
@@ -35,24 +32,27 @@ This study investigates how a Large Language Model can be leveraged as an automa
     style="border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.15);">
   </iframe>
   <p style="font-style: italic; color: #666; margin-top: 0.75rem; font-size: 0.95rem;">
-    LLM-guided pick-and-place task execution loop on the simulated UR10 manipulation platform.
+    LLM-guided pick-and-place sessions on the simulated UR10 tabletop platform.
   </p>
 </div>
 
-## 🛠️ Methodology & Core Contributions
+## Motivation
 
-Instead of executing resource-intensive fine-tuning or relying on dense descriptive embodiment alignments, this framework leverages the native zero-shot reasoning capabilities of LLMs to steer robot interactions toward complex environment configurations. This minimal approach allows us to directly probe the inherent physical understanding of LLMs and evaluate their broader applicability to robotics.
+Random exploration is common practice in reinforcement learning, navigation and manipulation, but in environments where the action-to-effect mapping is non-linear, stochastic or redundant, hard-to-reach states may never be experienced. In our previous work on [effect prediction and planning](/publication/2023-relational), composite structures such as bridges, T-shaped and U-shaped structures become possible as the number of objects grows and the action set is extended. Constructing them requires performing a series of correct actions, which becomes less and less likely to experience with random exploration as the complexity of the setup increases.
 
-### 1. Token-Efficient Prompt Engineering
-To bypass continuous active dialogue streams during live execution loops, a stateless prompting cycle resets at each new scene configuration. The framework programmatically constructs structured context packages combining three primary variables:
+Extracting the required knowledge from humans through imitation or parental scaffolding is one remedy, but data collection from humans is a labor-intensive process for complex learning tasks. Being trained on internet-scale data, LLMs can be utilized as knowledge bases instead. Grounded knowledge is scarce on the internet, however, and eliciting grounded inferences normally requires conditioning the model for the agent's embodiment, which brings an immense computation cost. Here the LLM is used solely as a light knowledge base: it selects among actions the robot can already execute, so no descriptive embodiment alignment is applied, and the sensorimotor data collected during scaffolded sessions remains grounded regardless of the reasoning that produced it.
 
-* **State Space Mapping ($$S_i$$):** Algorithmic translation of physical objects and spatial coordinates into color-coded natural language tokens (e.g., `the green cube is next to the purple cube`).
-* **Interaction Trajectory History ($$H_{1,\dots,i-1}$$):** A chronological digest of previous actions within the current session to ensure temporal conditioning.
-* **Bounded Action Windows ($$A_{1,\dots,k}$$):** Dynamically filtered sub-lists containing valid, kinematically executable actions extracted directly from the robot's physical repertoire.
+## Method
 
-The LLM is prompted broadly to seek an **"interesting outcome"**, implicitly drawing upon its encoded knowledge of human sensorimotor development. Crucially, the model is not explicitly informed that it is controlling a physical robot. To provoke deeper reasoning and stabilize execution selection, the prompt explicitly requires a text explanation before outputting the final choice.
+<div style="text-align: center; margin: 20px auto; max-width:100%;">
+<img src="/images/developmental.png" alt="One interaction step: the simulator state is serialized into natural language, combined with the session history and the list of executable actions, sent to GPT-3.5, and the parsed choice is executed in simulation, producing the next state." style="width:95%; display:block; margin:20px auto;">
+  <p style="font-style: italic; color: #666; margin-top: 8px;">Fig. 1: The scaffolding loop. The LLM sees only text and returns an index; every other stage is algorithmic.</p>
+</div>
 
-**Example System Prompt:**
+**The scaffolding loop.** Scaffolding is tested in sessions of ten object interactions in which the simulated robot receives action suggestions from the LLM. Each session begins with various numbers of cubes and spheres randomly initialized on the table. At each step the current object configuration and the possible action choices are described to the LLM in natural language using algorithmically generated prompts. The output is produced in a fixed format that can be easily parsed, and the selected action is executed. Providing the choices from the robot's action repertoire ensures that the selection will be within its execution capability. Each session is repeated 40 times to account for the stochasticity in initial object placement and choice generation.
+
+**Prompt definition.** In order not to introduce any bias towards a specific selection, the task definition in the system prompt simply consists of selecting an action with an interesting outcome. The model is also conditioned to provide the reasoning behind its selection before making a decision, since generating the reasoning first increases the success rate of the GPT in robotics tasks. The user prompt is generated as $\langle S_i \rangle \langle H_{1,\dots,i-1} \rangle \langle A_{1,\dots,k} \rangle$: the current configuration, listing the objects and the spatial relations between them with colours as unique identifiers, the session history, and the possible actions. Rather than conducting a dialogue during the whole session, a new dialogue is initialized for each configuration and the history is summarized in $H$.
+
 ```text
 [System]: There are some objects on the table. Which manipulation alternative on them yields an interesting outcome? 
 Choose one and explain.
@@ -61,160 +61,112 @@ Your output should be in the following format:
 Selected action is : <number of the selected action>
 ```
 
-**Example user prompt:**
 ```text
 [User]: There is an orange cube, a green cube, a purple cube, a brown sphere, and a light green cube in the current scene.
-the green cube is next to the purple cube.
-the brown sphere is in front of the purple cube.
 the light green cube is stacked on the purple cube.
 Previously executed actions:
-Put the brown sphere in front of the purple cube
-Put the green cube next to the purple cube
 Put the light green cube on top of the purple cube
 ...
 Possible actions:
 1 ) Put the green cube in front of the orange cube
-2 ) Put the brown sphere next to the light green cube
-3 ) Put the orange cube on top of the light green cube
+2 ) Put the orange cube on top of the light green cube
 ...
 ```
 
-### 2. Chain-of-Thought Reasoning
+All experiments use `gpt-3.5-turbo` at temperature 0.
 
-Enforcing the `<reasoning>` block to generate prior to the final action selection token allows the model to **incrementally condition its choices on sequential logic**. Providing the running session history alongside immediate scene text at each exploration step ensures behavioral coherence across multiple steps. 
+## My contributions
 
-For instance, once **committing to constructing a tall stack**, the model actively avoids diminishing the stack height if additional vertical choices are unavailable. Conversely, **once peak structural capacity is achieved, the model deconstructs the stack to seek alternative configurations**.
+- Wrote the survey of LLM-robotics grounding strategies and parental scaffolding that frames the study, which reviewers singled out for its coverage.
+- Co-developed the PyBullet UR10 environment and its discrete pick-and-place action space.
+- Devised the token-efficient prompting strategy, including the state description generation and the history summarization that removes the need for a dialogue across a session.
+- Designed and ran the experiments against the random exploration baseline, and produced the figures and the video.
+- Identified the disregard of sphere affordances and the hallucinated stacking relations through careful examination of the collected dialogues.
+- Wrote the first draft, incorporated co-author revisions, and handled the ICDL review response as corresponding author.
 
-### 3. Grounded Knowledge Auditing
+## Results
 
-The study provides a stress test of **embodied comprehension of LLMs**. While models effortlessly optimize stacking sequences across uniform geometries like cubes, they exhibit a severe **"cognitive gap"** when spheres are introduced.
+A purely random action selection strategy is used as the baseline. The visitation frequency to hard-to-reach states such as tall towers measures the exploration efficacy gained by LLM-based scaffolding.
 
-## 💻 My Contributions
-
-- **Performed a comprehensive literature review of LLM-robotics applications** and developmental parental scaffolding theories.
-
-- **Co-developed the PyBullet-based UR10 manipulator simulation**, including high-level discrete pick-and-place action spaces.
-
-- **Designed the zero-shot token-efficient state serialization layer**, converting physical scene configurations directly into compact LLM-consumable history inputs.
-
-- **Engineered experiment setups** comparing language-driven high-gain information paths against standard stochastic exploration methods.
-
-- **Created the data visualizations, figures**, and the promotional video of the paper.
-
-- **Uncovered systemic structural hallucinations within GPT-3.5's physical world planning models**, validating semantic failure modes via targeted exploratory tasks.
-
-- **Prepared the first draft and implemented alterations from my colleagues**, presenting my work and literature review while ensuring a coherent manuscript using my 2 professors' inputs.
-
-- **Took corresponding author responsibilities**, answered reviews of the ICDL committee and performed necessary changes on the final draft. 
-
-## 📊 Experimental Results
-
-
-We benchmarked the LLM-guided scaffolding framework against a **baseline random exploration policy over identical 10-step exploration windows**.
-
-### Tower Construction Efficiency
+### Comparison with the random baseline
 
 <div style="display: flex; align-items: center; justify-content: space-between; gap: 2rem; margin: 2rem 0; flex-wrap: wrap;">
-
 <div style="flex: 1; min-width: 320px; text-align: center;">
     <img 
       src="/images/scaffolding_tower_results.png" 
-      alt="Comparison of Maximum Object Height across Exploration Steps" 
+      alt="Tower height distributions across ten interactions under random and scaffolded exploration, in three environment settings of incremental difficulty." 
       style="width: 100%; border-radius: 6px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);"
     />
     <p style="font-style: italic; color: #666; margin-top: 0.5rem; font-size: 0.85rem;">
-      Fig. 1: Evolution of the maximum height achieved across exploration steps. The solid lines represent the mean maximum height across independent experimental runs.
+      Fig. 2: Comparison of tower heights between random and scaffolded exploration in environment settings with incremental difficulty: four cubes and two positions, then a fifth cube, then a third proximity location.
     </p>
   </div>
   <div style="flex: 1; min-width: 320px;">
-    
     <p>
-      LLM-scaffolding was evaluated by measuring the <b>maximum tower height achieved (representing rare, hard-to-reach environmental states) over 40 interaction sessions</b>. 
+      Nothing in the prompt asks for a tall tower. LLM scaffolded exploration discovers the tallest possible tower much earlier than random exploration in all three settings. As the complexity of the environment increases, the probability of visiting hard-to-reach states during random exploration decreases: in the most complex setting, random exploration fails to reach a tower of height five, while scaffolding reaches it in eight interaction sessions.
     </p>
-    <p>Crucially, no explicit directives instruct the model to increase the tower height. </p>
     <p>
-      LLM-scaffolded exploration outperforms the random exploration baseline by focusing early exploration steps on structural accumulation.
-      </p>
-      <p> In the most complex setup, <b>the random exploration policy fails to achieve the tallest stack</b>, whereas the scaffolded system regularly discovers peak tower heights within minimal operational steps.
+      This trend does not continue till the end of a session. Tall towers lose their novelty once encountered, so upon creating tall structures at the beginning of an episode the GPT proceeds to dismantle them in order to explore proximity relations, and a decrease in average height is observed in the later stages of exploration.
     </p>
   </div>
 </div>
-
 
 ### Effects of different prompts
 
-<div style="display: flex; align-items: center; justify-content: space-between; gap: 2rem; margin: 2rem 0; flex-wrap: wrap; direction: rtl;">
-  <div style="flex: 1; min-width: 320px; direction: ltr;">
+<div style="display: flex; flex-direction: row-reverse; align-items: center; justify-content: space-between; gap: 2rem; margin: 2rem 0; flex-wrap: wrap;">
+  <div style="flex: 1; min-width: 320px;">
     <p>
-      We observed that changing a <b>single word</b> in the prompts could yield dramatic changes in behaviour.
+      The experiments above requested actions yielding an "interesting" outcome. Replacing that adjective with "novel" in the system prompt produces a notable difference in the resulting tower heights.
     </p>
     <p>
-      Changing the word <b><u>interesting</u></b> to <b><u>novel</u></b> significantly decreased the average tower height.
+      Conditioned to yield a novel outcome, GPT-3.5 focuses on the history and actively avoids actions similar to the previously executed ones. Performing the stacking operation four consecutive times is therefore unlikely, resulting in a low visit frequency to states with complex structures. These results show the importance of selecting the appropriate words when minimal prompting is used.
     </p>
   </div>
-
-  <div style="flex: 1; min-width: 320px; text-align: center; direction: ltr;">
+  <div style="flex: 1; min-width: 320px; text-align: center;">
     <img 
       src="/images/scaffolding_differentadjectives.png" 
-      alt="The Affordance Blindspot Failure Modes" 
+      alt="Tower height distributions across ten interactions for the interesting and novel adjectives, in the five cubes and two positions setting." 
       style="width: 100%; border-radius: 6px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);"
     />
     <p style="font-style: italic; color: #666; margin-top: 0.5rem; font-size: 0.85rem;">
-      Fig. 2: Effects of different adjectives on the tower heights in a 5 cubes 2 positions setting.
+      Fig. 3: Effects of different adjectives on the tower heights in a 5 cubes, 2 positions setting.
     </p>
   </div>
 </div>
 
-### 3. Different Affordances
+### Exploiting the LLM's affordance knowledge
 
-When **spheres are introduced** to the environment, GPT's grounding vulnerabilities become apparent. Even under explicit instructions to maximize stack height, the presence of a sphere led to a performance degradation. Qualitative analysis confirmed that the model repeatedly hallucinated the sphere as a stable base. The assistant's answer below provides an illustration.
+Cubes are inherently easily graspable and stackable, so manipulating them does not require extensive knowledge regarding affordances. A sphere increases environmental complexity: stacking cubes on top of spheres results in the cubes dropping to the table surface, and the sphere must always occupy the topmost position of a tower. Instructed to create the highest possible tower, GPT-3.5 nevertheless shows a continuing preference towards placing spheres in middle positions, as this action immediately increases the height of the tower, and states that the sphere is a stable base to provide logical reasoning for these actions.
 
 <pre><code>[Assistant]: The best action would be to put the blue cube on top of the red sphere.
-This is because</code> <code><b>**the red sphere can provide a stable base for the cube, and the cube can sit 
-securely on top of the sphere**.</b></code></pre>
+This is because the red sphere can provide a stable base for the cube, and the cube
+can sit securely on top of the sphere.</code></pre>
 
-<div style="display: flex; align-items: center; justify-content: space-between; gap: 2rem; margin: 2rem 0; flex-wrap: wrap; direction: rtl;">
-  <div style="flex: 1; min-width: 320px; direction: ltr;">
-    <p>
-      Even when the LLM is specifically instructed to creating the tallest stack, introduction of sphere decreased the average stack height by <b>20%</b>.
-    </p>
-    <p>
-      When the LLM is directly asked if a sphere can provide a stable tower it correctly answered `No`.
-    </p>
-    <p>
-      While the <b>model maintains abstract textual knowledge that a sphere is unstable, it fails to transfer this rule when executing active spatial planning</b>.
-    </p>
-  </div>
+Asked directly whether a cube can be balanced on top of a sphere, GPT-3.5 indicates that it may not be feasible in the real world. Asked instead to generate the steps for building a high tower from a state description, the resulting steps are strongly biased toward the order of the objects appearing in it: if the sphere is not the first or the last object, it is eagerly placed in a mid position. The affordances of the sphere are disregarded in the planning task even though the knowledge is available on request.
 
-  <div style="flex: 1; min-width: 320px; text-align: center; direction: ltr;">
-    <img 
-      src="/images/scaffolding_towercreation.png" 
-      alt="The Affordance Blindspot Failure Modes" 
-      style="width: 100%; border-radius: 6px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);"
-    />
-    <p style="font-style: italic; color: #666; margin-top: 0.5rem; font-size: 0.85rem;">
-      Fig. 3: Comparison of average heights in different environments during LLM scaffolded sessions with tower creation task and the corresponding system prompt.
-    </p>
-  </div>
+<div style="text-align: center; margin: 20px auto; max-width:100%;">
+<img src="/images/scaffolding_towercreation.png" alt="Tower height distributions for the tower creation task, comparing five cubes against four cubes and one sphere." style="width:80%; display:block; margin:20px auto; border-radius: 6px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
+  <p style="font-style: italic; color: #666; margin-top: 8px;">Fig. 4: Comparison of average heights in different environments during LLM scaffolded sessions with the tower creation task.</p>
 </div>
 
-### Future Work
+## Discussion
 
-The gap between early text-only models and modern vision-language-action models (VLMs/VLAMs) is profound—particularly regarding embodied knowledge. By integrating direct visual peripherals, modern multi-modal architectures transcend the limitations of text, allowing the system to perceive spatial geometry, self-affordances, and physical constraints. **This sensory grounding fundamentally improves the model's grasp of embodied knowledge**. Re-evaluating developmental parental scaffolding concepts through the lens of these multimodal foundation models offers a highly promising path toward establishing practical, robust, and self-correcting exploration loops in complex environments.
+GPT-4 existed at the time but no API access was available to us, so it could not be driven from the interaction loop. Tested by hand in the tower creation task, GPT-4 was capable of placing the sphere in the top position regardless of the sphere's appearance order in the prompt, and some trials resulted in its discarding the sphere by stating it would not be stable even in the top position. These observations indicate a clear difference between the grounded reasoning capabilities of GPT-3.5 and GPT-4, and encourage future work on the exploration scaffolding capability of more powerful multimodal systems, in which geometry and affordances are available perceptually rather than through a generated description.
 
+An external knowledge source is not the only route past this exploration bottleneck. My [graduation project](/projects/intrinsic_curiosity) approaches the same problem from the opposite direction, deriving the guidance signal from the learner's own predictive uncertainty rather than from a model that already knows something about the world.
 
 ### BibTeX
 ```bibtex
 @inproceedings{Celik_2023,
    title={Developmental Scaffolding with Large Language Models},
    url={http://dx.doi.org/10.1109/ICDL55364.2023.10364374},
-   DOI=10.1109/icdl55364.2023.10364374,
+   DOI={10.1109/icdl55364.2023.10364374},
    booktitle={2023 IEEE International Conference on Development and Learning (ICDL)},
    publisher={IEEE},
    author={Celik, Batuhan and Ahmetoglu, Alper and Ugur, Emre and Oztop, Erhan},
    year={2023},
-   month=Nov, pages={396–402} }
-\```
+   month=Nov, pages={396--402} }
+```
 
 <style>
   /* Reduce side padding for the main content area */

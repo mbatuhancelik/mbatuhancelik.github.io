@@ -1,136 +1,129 @@
 ---
-title: "Intrinsic Curiosity for Deep Symbolic Robot Learning"
+title: "Intrinsic Motivation for Deep Symbol Learning"
 collection: projects
+date: 2024-02-04
 header:
-    video_teaser: '/images/instrinsic_curiosity_demo.mp4'
-excerpt: 'The prior [Relational DeepSym](/publication/2023-relational) framework requires on the order of **1 million samples** just to learn dynamics in a 4-object environment — a data bottleneck rooted in its reliance on uniform random exploration. I proposed and led this project, my **graduation project**, to tackle this bottleneck directly: to explore complex, counter-intuitive, and high-information-gain interactions and to probe the limitations of the Relational DeepSym architecture.'
-date: 04.02.2024
+    video_teaser: '/images/intrinsic_curiosity_demo.mp4'
+excerpt: 'An active exploration policy for Relational DeepSym that replaces uniform random exploration with an ensemble-disagreement signal. Councils trained on actively collected data improve planning accuracy by 10 percentage points over the random baseline at equal sample counts, and exceed it while using 23% fewer samples. The policy also reaches configurations absent from randomly collected datasets, including an emergent rotation that is not expressible as a single action primitive.'
+description: "Undergraduate graduation project: replacing uniform random exploration in the Relational DeepSym world model with an ensemble-disagreement signal. 10 percentage points higher planning accuracy at equal sample counts, and an emergent rotation absent from the action repertoire."
 ---
+
+
+Undergraduate graduation project (CMPE 492), Boğaziçi University. Advisors: Assoc. Prof. Emre Uğur and Alper Ahmetoğlu, CoLoRs Lab. Follow-up to [Discovering Predictive Relational Object Symbols with Symbolic Attentive Layers](/publication/2023-relational) [\[1\]](#ref-1) (IEEE RA-L 2024), of which I am a co-author.
 
 ## Abstract
 
-Curiosity is a form of intrinsic motivation key to reinforcing active learning and spontaneous exploration. Conceived and proposed independently following a comprehensive active learning literature review during concurrent work on [robotic scaffolding](/publication/2023-icdl-scaffolding), this project directly addresses the staggering data-efficiency and scalability limits of recently proposed [Relational Deepsym](/publication/2023-relational) architecture. Specifically, the framework aims to alleviate the severe data collection bottleneck of the baseline Relational DeepSym framework—which demands upwards of **1 million samples just to discover simple dynamics of 4-object environments**. By introducing an intrinsic curiosity paradigm driven by ensemble disagreement, the robotic agent utilizes the variance of a forward-prediction dynamics council as an epistemic motivation signal to actively target unlearned state-action pairs. We evaluate the proposed formulation within a simulated tabletop environment featuring 5 to 10 distinct physical entities. Our results demonstrate that targeting **"gaps in knowledge"** via active exploration drastically reduces data overhead, providing up to a **10% planning accuracy improvement over uniform random exploration**. Furthermore, qualitative analysis confirms that the **curiosity policy uncovers highly complex, counter-intuitive multi-object physical interactions that remain statistically improbable under random exploration policies**.
-
-[Github](https://github.com/mbatuhancelik/human2robot_cnmp/tree/master)
+Relational DeepSym [\[1\]](#ref-1) learns object and relational symbols from the self-supervised interaction of a manipulator with a tabletop environment, but its effect prediction error grows with the number of objects even when the dataset is scaled proportionally. We hypothesize that this degradation is a property of the exploration policy rather than of the architecture: the composite structures the model is asked to predict occur with a probability that falls exponentially in the object count, so uniform random exploration under-samples precisely the states that determine performance. In this work, random exploration is replaced by an intrinsic motivation signal derived from the disagreement of an ensemble of forward models. Actions on which the ensemble cannot agree are taken to be actions it has not learned, and are preferentially executed. In a tabletop environment with five to ten objects, councils trained on actively collected data achieve approximately 10 percentage points higher planning accuracy than the random baseline at equal sample counts, and exceed the baseline while using 23% fewer training samples. Qualitative analysis shows that the policy reaches configurations random exploration does not produce, including a rotation of a wide block obtained through a controlled collapse, despite the absence of any rotation primitive in the action repertoire.
 
 <div class="archive__item-teaser">
-    <video autoplay loop muted playsinline width="100%" style="display:block; object-fit:cover;">
-      <source src="/images/instrinsic_curiosity_demo.mp4" type="video/mp4">Your browser does not support the video tag.
+    <video autoplay loop muted playsinline width="100%" poster="/images/intrinsic_curiosity_demo_poster.jpg" style="display:block; object-fit:cover;">
+      <source src="/images/intrinsic_curiosity_demo.mp4" type="video/mp4">
+      Your browser cannot play this video. <a href="/images/intrinsic_curiosity_demo.mp4">Download it here.</a>
     </video>
 </div>
 
----
-
 ## Motivation
 
-While the original Relational DeepSym framework discovers symbolic relations reliably, it scales poorly due to its reliance on uniform random exploration. The baseline architecture requires roughly **1,000,000 samples** to learn forward dynamics in a **simple 4-object setup**. Most of this data consists of **redundant, low-information repetitions**, such as repeatedly restacking the same two blocks.
+In the preceding work [\[1\]](#ref-1), effect prediction error rises from 0.50 cm with two objects to 1.67 cm with three and 2.00 cm with four, although the corresponding datasets contain 120K, 180K and 240K samples respectively. Scaling the sample count with the object count does not arrest the degradation, which suggests that the additional samples are not distributed over the states that matter. In experiments run after publication, training on a six-object environment failed even with one million samples. The number of distinct effects grows with the number of objects, and the composite structures producing those effects are rare under a uniform policy. That paper identifies a guided exploration schedule as a promising direction; the present work follows it. Our previous work, [Developmental Scaffolding with Large Language Models](/publication/2023-icdl-scaffolding) (ICDL 2023), addresses the same bottleneck from outside the learner, using an LLM to choose among the actions the robot can execute. This project derives the guidance signal from the learner's own predictive uncertainty instead, which removes the dependence on a model that already knows something about the world.
 
-To formalize this bottleneck, the probability of an agent organically discovering a meaningful $n$-object composite interaction scales inversely with the factorial of the entity count:
+Two inefficiencies motivate the change. First, most samples collected by a random policy repeat transitions that are already predicted correctly and therefore carry no information, while consuming interaction time. Second, even when sufficient rare samples are eventually accumulated by brute force, the resulting dataset is unbalanced, and the surplus of high-probability samples contributes nothing further to training.
 
-$$P(\text{discovery}) \propto \frac{1}{n!}$$
+## Method
 
-As environments scale past simple setups, uniform random sampling becomes mathematically unviable under realistic robotics data constraints. This project replaces random sampling with an epistemic uncertainty mechanism to **actively discover the improbable, high-information-gain interactions** to bypass these scaling limits.
+Let $D$ be a dataset of state-action-effect triplets and $\{f_0, \dots, f_k\}$ a set of forward models trained on overlapping subsets of $D$. If $D$ contains sufficiently many samples of a given transition, most members will learn it; conversely, disagreement among members on a state-action pair indicates that the pair is not yet learned and that further samples of it will reinforce training. This is the argument underlying Query by Committee [\[2\]](#ref-2), and it has been applied to exploration by Pathak et al. [\[3\]](#ref-3) and by Sancaktar et al. [\[4\]](#ref-4). The motivation signal for a candidate action sequence is the trace of the covariance across the flattened predictions of the council:
 
-## 🛠️ Methodology & Core Contributions
+$$motivation(s, a_i, \{f_0, \dots, f_k\}) = \sum \text{trace}\left(\text{cov}\begin{bmatrix} \text{predict}(f_0(s, a_0, \dots, a_i)) \\ \vdots \\ \text{predict}(f_k(s, a_0, \dots, a_i)) \end{bmatrix}\right)$$
+
+The formulation is vectorized, so signals for many candidate actions are evaluated in parallel on a GPU. For horizons greater than one, `predict` concatenates the predicted effect after each action rather than using the final predicted state, since members reaching a common final state through different erroneous intermediate predictions would otherwise register as agreement.
+
+Rather than selecting the maximum, the policy samples uniformly from the ten highest-scoring candidates. Stochastic transitions, such as stacking a cube on a cylinder or collapsing a tower, are unpredictable by construction and would otherwise attract the policy indefinitely.
 
 <div style="text-align: center; margin: 20px auto; max-width:100%;">
-<img src="/images/curiosity_loop.png" alt="Active Exploration Loop and Training Framework" style="width:95%; display:block; margin:20px auto;">
-  <p style="font-style: italic; color: #666; margin-top: 8px;">Figure: Active Exploration Loop.</p>
+<img src="/images/curiosity_loop.png" alt="Exploration loop in which a seed dataset trains five council members, their prediction disagreement selects actions, and the resulting samples are appended to the dataset for the next generation." style="width:95%; display:block; margin:20px auto;">
+  <p style="font-style: italic; color: #666; margin-top: 8px;">Fig. 1: Continuous exploration loop with intrinsic motivation.</p>
 </div>
-This active data collection architecture replaces uniform random baselines with targeted, curiosity-driven exploration split into distinct operational phases.
 
-### 1. Data Bootstrapping and Partitioning
-* **Seed Dataset:** The model is bootstrapped using a small 15k sample dataset collected via a standard random exploration policy.
-* **80% Data Partitioning:** At each iteration, the dataset expands into a "Next iteration Dataset." Each individual Council Member ($0$ through $4$) trains on a randomized **80% partition of this data**, ensuring architectural and predictive diversity.
+The loop is bootstrapped with a 15k-sample dataset collected under the random policy. At each generation, five councils are trained, each on a random 80% partition of the current dataset, the active policy collects 6k samples, and these are appended to the training pool. Councils are retrained from scratch at every generation rather than fine-tuned, as symbols learned from earlier data may be insufficient to describe newly discovered features, and continued training risks fixing the weights in a minimum in which the new samples are not fit. The cost of retraining is small relative to the cost of data collection at this scale.
 
-### 2. The Epistemic Disagreement Council
-During online exploration, the agent utilizes **council disagreement** to estimate epistemic uncertainty over long-horizon effect predictions.
+## Experiments
 
-* **State-Action Filtering:** The environment feeds the current **State** and a random subset of 300 **Available Action Sequences** (constrained to a lookahead horizon length of 5 due to VRAM limits) into the council.
-* **Variance-Driven Rewards:** Each member generates a forward prediction. The system computes the intrinsic motivation reward using the trace of the covariance matrix across flattened prediction vectors as the measure of disagreement:
+The environment of the preceding work [\[1\]](#ref-1) is used, extended to five to ten objects of four types: cube, cylinder, tall block and wide block. The robot is a UR10 with a single high-level action, grasping an object and placing it on top of or near another object. Models are compared by planning accuracy: given two consecutive states from a test set, A* searches for an action sequence realizing the transition, counted as successful within 9 cm. Validation and test sets of 6k samples are collected at each generation under both policies. Data budgets were restricted deliberately in order to expose sample-efficiency differences rather than asymptotic performance.
 
-$$motivation(s, a_i, \{f_0, \dots, f_k\}) = \sum \text{trace}\left(\text{cov}\begin{bmatrix} \text{predict}(f_0(s, a_0, \dots, a_i)) \\ \text{predict}(f_1(s, a_0, \dots, a_i)) \\ \vdots \\ \text{predict}(f_k(s, a_0, \dots, a_i)) \end{bmatrix}\right)$$
+Two configurations were evaluated. The single-horizon policy sets the search depth to one and scores all available actions. The long-horizon policy compares 100 sequences of length five, the maximum a 24 GB GPU supports, corresponding to 0.032% of the search space at that depth.
 
-* **Mitigating Stochastic Traps:** To avoid getting stuck in stochastic dynamics (the "noisy TV" trap), the **policy samples randomly** from the top 10 highest-disagreement trajectories instead of greedy picking.
-
-### 3. Multi-Generational Regeneration Loop
-* **Feedback Pipeline:** The chosen action sequences(2 selections, 10 actions total) execute in simulation, returning 6k high-information samples per generation back into the training pool.
-* **Council Resetting:** Rather than fine-tuning weights—which traps networks in local minima, **new councils are re-trained from scratch** on the updated data pools. Retraining cost is small relative to the cost of data collection at this scale.
-
----
-
-## 📊 Experimental Results
-
-The framework was evaluated using a UR10 robotic manipulator interacting with 5 to 10 distinct entities (cubes, cylinders, tall blocks, and wide blocks) using high-level, object-relative grasp and place actions. Models were benchmarked on planning success rates using the $A^*$ algorithm to reach target states within a strict 4 cm (half-cube width) error margin. Data budgets were intentionally restricted to highlight sample-efficiency differentials.
-
-### Planning Performance Comparison
-The actively explored councils achieved significant sample-efficiency gains over the random baseline:
-
-| Exploration Policy Generation | Accuracy on Random Test Data | Target Sample Size |
+| Council | Planning accuracy | Training samples |
 | :--- | :---: | :---: |
-| **Random Baseline (Gen 6)** | $$0.52$$ | 51k samples |
-| **Single Horizon (Gen 4)** | **$$0.58$$** | **39k samples** |
-| **Single Horizon (Gen 6)** | **$$0.62$$** | 51k samples |
+| Random baseline, gen 6 | 0.52 | 51k |
+| Single horizon, gen 4 | 0.58 | 39k |
+| Single horizon, gen 6 | 0.62 | 51k |
 
-> **Key Takeaway:** Generation 4 of the curiosity model outperformed Generation 6 of the random baseline while utilizing **12,000 fewer (23% less) training samples**.
+Accuracies are averaged over seven randomly collected test sets. At equal sample counts the single-horizon council is approximately 10 percentage points ahead. Generation 4 of the single-horizon policy exceeds generation 6 of the baseline while training on 12k fewer samples.
 
-### Emergent Exploration Themes
-The variance tracker forces the agent through distinct learning phases as it exhausts predictable environment dynamics:
-* **Generation 1:** Targets structural contact physics, executing boundary actions to resolve grasp failures.
-* **Generations 2–5:** Shifts directly toward complex multi-object movements and structural stacking to maximize council uncertainty.
+Evaluated on the actively collected test sets, all councils, including those trained under the active policy, score lower than on the randomly collected sets, and the variance across sets is markedly higher. Both observations support the claim that the active policy samples a different and less homogeneous distribution, and indicate that the improvement above is not an artifact of a test distribution favouring the curious councils.
+
+Themes in the collected data are traceable through Cartesian coordinates alone. Grasp success falls sharply in generation 1 and recovers thereafter, indicating that failing grasps are initially the least predictable outcomes available. From generation 2 onward the policy shifts toward multi-object movement, in which a wide block is used as a tray to displace several objects at once.
 
 <div style="text-align: center; margin: 20px auto; max-width:100%;">
-<img src="/images/grasp_rate.png" alt="Active Exploration Loop and Training Framework" style="width:95%; display:block; margin:20px auto;">
-  <p style="font-style: italic; color: #666; margin-top: 8px;">Figure: Successful grasp rate among different generations. Stark drop in generation 1 indicates the active exploration of unsuccessful grasp operation.</p>
+<img src="/images/grasp_rate.png" alt="Successful grasp rate per generation, falling to approximately 0.37 in generation 1 and remaining near 0.9 in all others." style="width:95%; display:block; margin:20px auto;">
+  <p style="font-style: italic; color: #666; margin-top: 8px;">Fig. 2: Successful grasp rate across generations. The drop in generation 1 reflects active exploration of failing grasps.</p>
 </div>
 
----
+## Emergent interactions
 
-### 🔍 Qualitative Analysis
-
-The Generation 6 curiosity policy consistently yielded clusters of high-information trajectories matching two distinct emergent physical themes.
-
-### 1. Emergent Rotation Operations via Controlled Collapses
-Despite **rotation primitives being explicitly omitted** from the action repertoire, the active exploration policy discovered a multi-step sequence that rotates wide objects using a controlled fall. Because rotated states have yet to be encountered, these configurations induce maximum epistemic uncertainty, making rotation a primary exploration theme.
-
-Crucially, this specific simulation environment was used continuously by twelve undergraduate students, three master's students, and a PhD candidate over an 18-month period. Throughout that lifecycle, **this precise physical interaction boundary was never discovered** through manual testing, validating the method's ability to locate isolated, high-information edge cases.
+Rotation is not among the action primitives, which permit only grasping and placement. The policy nonetheless discovered a sequence leaving a wide block perpendicular to the table: the block is placed on a tall prism and a cube is then placed to its left, inducing a controlled fall. Perpendicular configurations are absent from the training distribution, so council predictions on them diverge and the policy pursues them. This environment was implemented approximately eighteen months before these experiments and used continuously over that period by its author and by a PhD student in the same laboratory, neither of whom had identified this configuration as reachable.
 
 <div style="text-align: center; margin: 20px auto; max-width:100%;">
-  <video width="100%" controls autoplay loop muted playsinline style="border-radius: 4px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
+  <video width="100%" controls autoplay loop muted playsinline poster="/images/tall_cut_demo_fixed_poster.jpg" style="border-radius: 4px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
     <source src="/images/tall_cut_demo_fixed.mp4" type="video/mp4">
-    Your browser does not support the video tag.
+    Your browser cannot play this video. <a href="/images/tall_cut_demo_fixed.mp4">Download it here.</a>
   </video>
-  <p style="font-style: italic; color: #666; margin-top: 8px;">Figure: Emergent rotation dynamics. The agent exploits physics boundaries to induce a controlled perpendicular drop, generating high-uncertainty spatial states.</p>
+  <p style="font-style: italic; color: #666; margin-top: 8px;">Fig. 3: Emergent rotation. A controlled collapse yields a configuration absent from the training distribution.</p>
 </div>
 
-### 2. Multi-Step Manipulation of Composite Structures
-The agent autonomously **constructs complex composite structures to probe their affordances** by interacting with their base components. In this example, the policy attempts to position a brown cube to the right of a green cube. Because action primitives are restricted to top-down vectors, targeting the foundation displaces an overlapping blue cylinder, forcing the agent to reason directly through the structural hierarchy.
-
-Evaluating this transition requires **multi-step structural reasoning over nested symbolic relations**, which is an out-of-distribution bottleneck for standard Relational DeepSym. To compute the grasping target, the model must resolve that a wide object sits on top of the brown cube, which in turn supports a blue cylinder on its leftmost component. An equivalent multi-tier inference chain must be resolved to identify the valid placement coordinate. This complex relational dependency caused high council uncertainty, fulfilling the exact objective of the active framework.
+A second theme is interaction with the base of a composite structure. Since the primitives are top-down, targeting a foundational block displaces the objects resting above it. Predicting such a transition requires resolving several tiers of relations, which is where Relational DeepSym is weakest and where council disagreement is correspondingly highest.
 
 <div style="text-align: center; margin: 20px auto; max-width:100%;">
-  <video width="100%" controls autoplay loop muted playsinline style="border-radius: 4px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
+  <video width="100%" controls autoplay loop muted playsinline poster="/images/complex_cut_demo_poster.jpg" style="border-radius: 4px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
     <source src="/images/complex_cut_demo.mp4" type="video/mp4">
-    Your browser does not support the video tag.
+    Your browser cannot play this video. <a href="/images/complex_cut_demo.mp4">Download it here.</a>
   </video>
-  <p style="font-style: italic; color: #666; margin-top: 8px;">Figure: High-order composite interaction. The agent targets foundational blocks within a multi-tier structure, forcing the model to predict complex, nested physical dependencies.</p>
+  <p style="font-style: italic; color: #666; margin-top: 8px;">Fig. 4: Manipulation of a multi-tier structure through its foundation, requiring prediction over nested relations.</p>
 </div>
 
----
+## Negative results
 
-## Conclusion
+The project began as an attempt to grow the symbol set itself. An earlier formulation searched for novelty in symbolic rather than effect space: a state-action pair whose symbolic description had not been observed before is one whose relations the model has not yet encoded, and collecting such pairs should extend the symbol set rather than reinforce it. Finding unexplored samples is a density estimation problem, and the Relational DeepSym encoder already extracts the relational information such an estimator requires, so the encoder was used to reduce state-action pairs to discrete graphs whose occurrence counts were stored in a lookup table, the least frequent pair being taken as the most novel. Improvements over random exploration proved indistinguishable from noise.
 
-This project demonstrates that an epistemic, curiosity-driven active exploration policy successfully mitigates the data collection bottlenecks of relational world models. While baseline configurations require upwards of 1 million samples to comprehend simple 4-object dynamics, this architecture **uncovers complex multi-object physics with a fraction of the data overhead**. Bootstrapped on a modest 15k sample seed dataset, the 5-member disagreement council drives the agent to isolate high-information state-action pairs efficiently. 
+The reduction is performed by a network trained on the data collected so far, so a genuinely novel state, whose distinguishing properties the encoder was never trained to represent, is mapped onto familiar symbols rather than extrapolated to new ones. The metric is therefore blind precisely where it is required to discriminate. Reformulating the objective from which states are novel to which states are predicted poorly removes the dependence on extrapolation, and motivates the disagreement signal above.
 
-Experimental results validate a 10% planning accuracy improvement over random exploration within a strict 4 cm error margin. Notably, the Generation 4 curiosity model outpaces the Generation 6 random baseline while utilizing 23% less training data, **proving that targeting gaps in knowledge yields major sample-efficiency gains**. Finally, qualitative analysis confirms that maximizing epistemic uncertainty provokes the autonomous discovery of complex, out-of-distribution behaviors—such as unprogrammed rotation actions and multi-step structural manipulation—which were completely missed during 18 months of manual testing.
+Extending the horizon did not improve on the single-horizon policy. Although long-horizon councils outperform the random baseline, the datasets they collect are simpler, in the sense that all councils achieve high accuracy on them. This is attributed to parametrization rather than to horizon depth: evaluating 100 sequences samples 0.032% of the depth-five search space, and the low-probability structures the policy is intended to find are unlikely to appear among the candidates considered. Sancaktar et al. [\[4\]](#ref-4) report substantial gains from longer novelty horizons, which makes the memory constraint the more probable explanation. Distinguishing the two requires sweeping depth and width, each configuration costing several days of experiment time.
 
-## Future Work
+## Limitations and future work
 
-This active framework provides a highly promising foundation for data-efficient symbolic learning, with several clear trajectories for future extension:
+Results come from a single seed in one environment without repeated runs; the gap is consistent across all seven test sets, but no error bars can be reported. Budgets were capped to expose sample efficiency, so neither policy was run to convergence and the ceiling of the method is unknown.
 
-* **Better Quantitative Analysis:** The entire quantitative evaluation for this project was crammed into a six-hour window during finals week. Needless to say, neither I nor my advisor, Dr. Ahmetoglu, were in the right state of mind to envision insightful data visualizations, explaining their absence.
-* **Incremental Symbolic Models:** Integrating incremental training logic (similar to [NSCL](https://arxiv.org/abs/1904.12584) by Mao et al.) could resolve Relational DeepSym's architectural limits. A model supporting incremental symbolic logic would further compress data requirements by exploiting overlaps between generations.
-* **Full Dynamics Convergence:** Because the data budget in this iteration was restricted to highlight sample-efficiency differentials, a logical next step is running the multi-generational training loop to full convergence to discover the council's true learning capacity.
-* **Structural Exploration Biases:** Future iterations will explore integrating structural heuristics. Biasing action selection toward existing object clusters and tall assemblies will deliberately force the agent into highly intricate, high-order multi-object manipulation episodes.
-* **Scaling Environment Complexity:** The current setup manages 5 to 10 physical entities. Increasing the entity count is necessary to stress-test the limits of the framework, as the current model successfully resolved all dynamics explored by the active policy.
-* **Alleviating Compute and VRAM Constraints:** Hardware limitations currently cap lookahead horizons to a length of 5 and a subset of 300 action sequences despite optimization. Scaling compute capabilities or optimizing the underlying prediction pipeline will allow the framework to scale to longer horizons, eliminating in-generation repetitions.
+The two policies have not been combined, and the horizon parameters remain unswept. Introducing bias toward existing clusters and tall assemblies in action selection would target composite structures directly, though the literature disagrees on whether such bias is necessary [\[5\]](#ref-5), [\[6\]](#ref-6). Internal results in the laboratory indicate that removing the Gumbel-sigmoid [\[7\]](#ref-7), [\[8\]](#ref-8) discretization improves both training speed and prediction accuracy, suggesting exploration without discretization followed by training of discretized models for planning. Finally, Relational DeepSym is retrained from scratch at each generation; incremental symbol learning [\[9\]](#ref-9) would allow successive generations to reuse what earlier ones acquired.
+
+## Code
+
+The codebase is forked from the private repository of the preceding work and cannot be released publicly. Access is available on request: batuhancelik.boun@gmail.com
+
+## References
+
+<a id="ref-1"></a>[1] A. Ahmetoglu, B. Celik, E. Oztop, and E. Ugur, "Discovering predictive relational object symbols with symbolic attentive layers," *IEEE Robotics and Automation Letters*, 2024. [arXiv:2309.00889](https://arxiv.org/abs/2309.00889)
+
+<a id="ref-2"></a>[2] H. S. Seung, M. Opper, and H. Sompolinsky, "Query by committee," in *Proceedings of the Fifth Annual Workshop on Computational Learning Theory*, 1992, pp. 287–294.
+
+<a id="ref-3"></a>[3] D. Pathak, D. Gandhi, and A. Gupta, "Self-supervised exploration via disagreement," in *Proceedings of the 36th International Conference on Machine Learning*, PMLR vol. 97, 2019, pp. 5062–5071. [Link](https://proceedings.mlr.press/v97/pathak19a.html)
+
+<a id="ref-4"></a>[4] C. Sancaktar, S. Blaes, and G. Martius, "Curious exploration via structured world models yields zero-shot object manipulation," *Advances in Neural Information Processing Systems*, vol. 35, 2022, pp. 24170–24183.
+
+<a id="ref-5"></a>[5] B. Norman and J. Clune, "First-explore, then exploit: Meta-learning intelligent exploration," arXiv preprint, 2023. [arXiv:2307.02276](https://arxiv.org/abs/2307.02276)
+
+<a id="ref-6"></a>[6] F. Kaplan and P.-Y. Oudeyer, "Curiosity-driven development," in *Proceedings of the International Workshop on Synergistic Intelligence Dynamics*, 2006, pp. 1–8.
+
+<a id="ref-7"></a>[7] C. J. Maddison, A. Mnih, and Y. W. Teh, "The concrete distribution: A continuous relaxation of discrete random variables," arXiv preprint, 2016. [arXiv:1611.00712](https://arxiv.org/abs/1611.00712)
+
+<a id="ref-8"></a>[8] E. Jang, S. Gu, and B. Poole, "Categorical reparameterization with Gumbel-softmax," arXiv preprint, 2016. [arXiv:1611.01144](https://arxiv.org/abs/1611.01144)
+
+<a id="ref-9"></a>[9] J. Mao, C. Gan, P. Kohli, J. B. Tenenbaum, and J. Wu, "The neuro-symbolic concept learner: Interpreting scenes, words, and sentences from natural supervision," in *International Conference on Learning Representations*, 2019. [arXiv:1904.12584](https://arxiv.org/abs/1904.12584)

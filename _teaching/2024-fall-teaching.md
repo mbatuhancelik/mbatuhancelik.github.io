@@ -1,15 +1,16 @@
 ---
-title: "Student Teaching Assistant"
+title: "CMPE443 — Principles of Embedded Systems Design (Fall 2024)"
 collection: teaching
-type: "CMPE443 Principles of Embedded Systems Design"
+type: "Student Teaching Assistant"
 permalink: /teaching/2024_fall
 venue: "Boğaziçi University, Department of Computer Engineering"
-date: 2024-08-01
+date: 2024-09-01
 location: "Istanbul, Turkey"
+description: "Undergraduate TA for CMPE443 Principles of Embedded Systems Design at Boğaziçi University, Fall 2024: co-instructed STM32 lab sessions."
 ---
 
-- Co-instructed **hands-on lab sessions** on embedded systems design utilizing STM32-Nucleo MCUs to interface with sensors, ADCs, and external peripherals.
+- Co-instructed the hands-on lab sessions, in which students used STM32-Nucleo microcontrollers to interface with sensors, ADCs, and external peripherals.
 
-- **Guided students through hardware troubleshooting** (breadboarding, wiring) and **firmware debugging** (interrupts, timers), while managing **grading and academic evaluations**.
+- Helped students debug hardware (breadboarding, wiring) and firmware (interrupts, timers), and handled grading and academic evaluation for the labs.
 
 <!-- more -->

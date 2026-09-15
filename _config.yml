@@ -9,10 +9,10 @@
 # Basic Site Settings
 locale                   : "en-US"
 site_theme               : "default" # The available themes options are "default", "air", "sunrise", "mint", "dirt" and "contrast"
-title                    : "Batuhan Celik"
-title_separator          : "-"
-name                     : &name "Batuhan Celik"
-description              : &description "Batuhan Celik's academic projects"   # Update this with a general description of your site, this is the default if not overridden by a page
+title                    : "Batuhan Çelik"
+title_separator          : "·"
+name                     : &name "Batuhan Çelik"
+description              : &description "Batuhan Çelik — symbolic representation learning and curiosity-driven exploration for embodied agents. Publications, projects, and CV."   # Update this with a general description of your site, this is the default if not overridden by a page
 url                      : https://mbatuhancelik.github.io # The base hostname & protocol for your site e.g. "https://[your GitHub username].github.io",
                                                            # or if you already have some other page hosted on Github then use "https://[your GitHub username].github.io/[Your Repo Name]"
 baseurl                  : "" # the subpath of your site, e.g. "/blog"
@@ -24,9 +24,9 @@ repository               : "mbatuhancelik/mbatuhancelik.github.io"
 author:
   # Biographic information
   avatar           : "profile.jpg"
-  name             : "Batuhan Celik"
+  name             : "Batuhan Çelik"
   pronouns         : "They/them"
-  bio              : "Prospective master/PhD student interested in cognitive AI, curiosity driven learning, and causality." #TODO: edit this depending on your application
+  bio              : "Applying for master's/PhD admission, Fall 2027. Symbolic representation learning and curiosity-driven exploration for embodied agents." #TODO: edit this depending on your application
   location         : "Ankara, Turkey"
   employer         : "Boğaziçi University"
   uri              : # URL
@@ -192,6 +192,15 @@ exclude:
   - README
   - tmp
   - vendor
+  - markdown_generator
+  - scripts
+  - talkmap
+  - talkmap.ipynb
+  - talkmap_out.ipynb
+  - talkmap.py
+  - Page_audit.md
+  - docker-compose.yaml
+  - _config_docker.yml
 keep_files:
   - .git
   - .svn
@@ -337,12 +346,15 @@ whitelist:
 #  - <base_path>/tags/my-awesome-tag/index.html ~> path: /tags/
 #  - <base_path/categories/my-awesome-category/index.html ~> path: /categories/
 #  - <base_path/my-awesome-category/index.html ~> path: /
-category_archive:
-  type: liquid
-  path: /categories/
-tag_archive:
-  type: liquid
-  path: /tags/
+# Category/tag archive pages were removed along with the rest of the unused
+# AcademicPages template scaffolding. Leaving `type` unset stops the taxonomy
+# includes from emitting links to pages that no longer exist.
+# category_archive:
+#   type: liquid
+#   path: /categories/
+# tag_archive:
+#   type: liquid
+#   path: /tags/
 # https://github.com/jekyll/jekyll-archives
 # jekyll-archives:
 #   enabled:

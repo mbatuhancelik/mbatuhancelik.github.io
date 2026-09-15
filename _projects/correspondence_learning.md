@@ -3,8 +3,9 @@ title: "Human-to-Robot Skill Transfer with Blending CNMPs"
 collection: projects
 header:
     video_teaser: '/images/human_to_robot.mp4'
-date: 28.08.2023
+date: 2023-08-28
 excerpt: 'Extending the Blending-CNMP framework to noisy, vision-based human demonstrations — bridging the embodiment and Cartesian-to-joint-space gap to transfer reaching skills between a human and the Torobo manipulator.'
+description: "Extending Blending-CNMPs to vision-tracked human demonstrations, transferring reaching skills between a human demonstrator and the Torobo manipulator across the Cartesian-to-joint-space gap. Osaka University, SISReC."
 ---
 
 > **Note:** This is an independent project extending [Aktaş et al. (2023)](https://arxiv.org/abs/2310.13458). I am **not an author** on that paper — see [Context](#context) below.
@@ -12,11 +13,14 @@ excerpt: 'Extending the Blending-CNMP framework to noisy, vision-based human dem
 
 ## Abstract
 
-This project extends the Blending Conditional Neural Movement Primitives (Blending-CNMP) framework — originally validated only on clean, simulated robot-to-robot data — to a human-in-the-loop setting. Human reaching movements were captured with an Intel RealSense camera and MediaPipe, which introduces low-frequency drift that the blending-CNMP encoder proved highly sensitive to. A filtering and normalization pipeline conditions these trajectories before encoding, allowing the shared latent space to converge. The result is bidirectional skill transfer between a human demonstrator and the Torobo manipulator, mapping human Cartesian coordinates to Torobo joint-space trajectories on unseen, interpolated targets.
+This project extends the Blending Conditional Neural Movement Primitives (Blending-CNMP) framework — originally validated only on clean, simulated robot-to-robot data — to a human-in-the-loop setting. Human reaching movements were captured with an Intel RealSense camera and MediaPipe, which introduces low-frequency drift that the blending-CNMP encoder proved highly sensitive to. A filtering and normalization pipeline conditions these trajectories before encoding, allowing the shared latent space to converge. The result is bidirectional skill transfer between a human demonstrator and the Torobo manipulator (with the robot → human direction validated numerically only), mapping human Cartesian coordinates to Torobo joint-space trajectories on unseen, interpolated targets.
+
+[Code on GitHub](https://github.com/mbatuhancelik/human2robot_cnmp)
 
 <div class="archive__item-teaser">
-    <video autoplay loop muted playsinline width="100%" style="display:block; object-fit:cover;">
-      <source src="/images/human_to_robot.mp4" type="video/mp4">Your browser does not support the video tag.
+    <video autoplay loop muted playsinline width="100%" poster="/images/human_to_robot_poster.jpg" style="display:block; object-fit:cover;">
+      <source src="/images/human_to_robot.mp4" type="video/mp4">
+      Your browser cannot play this video. <a href="/images/human_to_robot.mp4">Download it here.</a>
     </video>
 </div>
 
@@ -41,9 +45,9 @@ $$L = p \cdot L^A + (1-p) \cdot L^B \quad \text{where} \quad p \sim U(0,1)$$
 
 Given a target query timestamp ($$t_{\text{target}}$$), the shared representation is processed by agent-specific decoders ($$Q^A$$ and $$Q^B$$) to predict the trajectory mean ($$\mu$$) and variance ($$\sigma$$). At inference time, task-level skill transfer is achieved symmetrically by forcing the blending weight of the source agent to 1 (and the target to 0). The shared representation is generated purely from the source's observations and decoded through the target agent's specific decoder.
 
-While highly effective across simulated robot pairs, the baseline framework operates under a major limiting assumption: **all agent trajectories are assumed to be clean, high-frequency sensorimotor streams**. Extending this formulation to handle noisy, vision-tracked human demonstrations introduces severe data-distribution shifts that prevent latent convergence.
+The baseline framework works well across simulated robot pairs, but it assumes every agent's trajectories are clean, high-frequency sensorimotor streams. Vision-tracked human demonstrations violate that assumption badly enough to prevent the latent space from converging at all.
 
-## 🛠️ Methodology & Core Contributions
+## Methodology
 
 ### 1. Vision-Based Trajectory Capture
 * **Hardware Setup:** Human arm-reaching movements were recorded in 3D Cartesian space using an Intel RealSense depth camera.
@@ -78,14 +82,16 @@ The learned latent space was forced to bridge two distinct domain gaps simultane
 
 Trained on 7 trajectories at 30°-spaced targets, the model was evaluated on interpolated targets between trained angles — a genuine generalization test rather than a replay of a trained motion. Transfer succeeded in both directions on these held-out targets:
 
-| Transfer Direction | Evaluation | Max End-Effector Error |
-| :--- | :---: | :---: |
-| Human → Torobo Robot | Video demo + trajectory comparison | ~3 cm |
-| Torobo Robot → Human | Numerical comparison only | ~3 cm |
+| Transfer Direction | Evaluation | Error measured |
+| :--- | :---: | :--- |
+| Human → Torobo | Video demo + trajectory comparison | ~3 cm between the decoded Torobo end-effector position (forward kinematics on the predicted joint trajectory) and the target |
+| Torobo → Human | Numerical comparison only | ~3 cm between the decoded Cartesian wrist trajectory and the held-out MediaPipe wrist track |
+
+The two rows measure different things and happen to land at a similar magnitude. On the human side there is no physical end effector, so "error" is the deviation of the predicted wrist keypoint from the recorded one; on the robot side it is a position error in the workspace.
 
 ## Context
 
-This project was completed during a summer research internship at **SISREC, Osaka University**, supervised by **Prof. Erhan Öztop**. The idea came from a discussion with **Prof. Minoru Asada** during a lab presentation, as a possible real-robot extension of the blending-CNMP paper's experiments. My internship ended before real-hardware trials were possible, and given the paper's already-substantial scope, we agreed not to add another contributor for a simulation-only result. This remains an independent project, not part of the publication.
+This project was completed during a summer research internship at **SISReC, Osaka University**, supervised by **Prof. Erhan Öztop**. The idea came from a discussion with **Prof. Minoru Asada** during a lab presentation, as a possible real-robot extension of the blending-CNMP paper's experiments. The paper it builds on was posted to arXiv in October 2023, after this project's date — I worked from the group's in-progress version while in the lab that summer. My internship ended before real-hardware trials were possible, and given the paper's already-substantial scope, we agreed not to add another contributor for a simulation-only result. This remains an independent project, not part of the publication.
 
 ## Citation
 
@@ -101,7 +107,6 @@ This project was completed during a summer research internship at **SISREC, Osak
   title={Conditional neural movement primitives},
   author={Seker, M. Yunus and Imre, Mert and Piater, Justus H. and Ugur, Emre},
   booktitle={Robotics: Science and Systems (RSS)},
-  volume={10},
   year={2019}
 }
 ```
