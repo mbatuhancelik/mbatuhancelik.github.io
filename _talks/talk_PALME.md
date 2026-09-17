@@ -16,4 +16,4 @@ A reading-group talk on **PaLM-E**, which injects continuous sensor modalities �
 
 PaLM-E was among the first models to embed continuous sensor data into an LLM this way, and it shaped much of the LLM-robotics work that followed, including the framing my own [ICDL 2023 paper](/publication/2023-icdl-scaffolding) reacts to. Its reported strengths are sample-efficient sequential robot planning and zero-shot transfer across embodiments, while remaining competitive as a general vision-language model.
 
-[Slides](https://docs.google.com/presentation/d/1dAP3PDUKfRNCWC9-H4c5y0bCXlgfKCJmxHVYdSIzABY/edit?usp=sharing) · [Project page](https://palm-e.github.io/)
+[Slides](https://docs.google.com/presentation/d/1dAP3PDUKfRNCWC9-H4c5y0bCXlgfKCJmxHVYdSIzABY/preview) · [Project page](https://palm-e.github.io/)

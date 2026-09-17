@@ -16,4 +16,4 @@ Presented my work on "Developmental Scaffolding with Large Language Models" duri
 
 Additionally, communicated this work through a poster presentation session for the **Robotics and AI Labs Group ([ROYAL](https://royal.bogazici.edu.tr/en))** at Boğaziçi University.
 
-[Slides](https://docs.google.com/presentation/d/1n08F8FPkEChqHu2RbaopropMkGUoRqORhMp8IWGfUgw/edit?usp=sharing) [Paper](/publication/2023-icdl-scaffolding)
+[Slides](https://docs.google.com/presentation/d/1n08F8FPkEChqHu2RbaopropMkGUoRqORhMp8IWGfUgw/preview) [Paper](/publication/2023-icdl-scaffolding)
