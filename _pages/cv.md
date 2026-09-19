@@ -80,10 +80,10 @@ I work on neurosymbolic approaches to robot learning: extracting discrete, compo
 
   [Publication Page](/publication/2023-icdl-scaffolding).
 
-* **Human-to-Robot Motion Transfer (Blending-CNMPs):**
-  * Extended the Blending-CNMP architecture — originally for robot-to-robot skill transfer — to a human-in-the-loop setup, capturing demonstrations with an Intel RealSense camera and MediaPipe 3D tracking.
+* **Human-to-Robot Skill Transfer through Correspondence Learning:**
+  * Extended the Blending-CNMP architecture, originally for robot-to-robot skill transfer, to a human-in-the-loop setup, capturing demonstrations with an Intel RealSense camera and two image-plane coordinates from MediaPipe's pose landmarks.
   * Diagnosed the CNMP encoder's sensitivity to the low-frequency drift that vision tracking introduces, which is distinct from the high-frequency jitter the architecture was designed to tolerate, and corrected it with a filtering and normalization pipeline.
-  * Achieved cross-embodiment Cartesian-to-joint-space motion transfer to the Torobo manipulator, with ~3 cm error on held-out interpolated targets.
+  * Achieved cross-embodiment Cartesian-to-joint-space motion transfer to a simulated Torobo manipulator, reaching targets between the trained ones with a largest observed end-effector error of 2.98 cm, measured interactively rather than over a held-out set.
 
   [Project Page](/projects/correspondence_learning) with demonstrations.
 

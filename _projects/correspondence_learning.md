@@ -16,18 +16,18 @@ Independent project, carried out during a summer research internship at SISReC, 
 
 Aktaş et al. learn task-level correspondences between robots with different bodies by blending the latent representations of each agent's Conditional Neural Movement Primitives into one common representation, from which either agent's trajectory can be decoded. Their conclusion names humans among the agents worth testing next. This project does that. A human reaching movement is captured with an Intel RealSense camera and MediaPipe, and the same architecture maps it onto joint trajectories for a simulated Torobo humanoid. Camera-tracked trajectories carry a slow drift that the encoder does not tolerate, and training on raw landmarks does not converge; a five-tap moving average and a per-trajectory geometric normalization condition them first. Trained on seven demonstrations at targets 30° apart, the model reaches targets lying between the trained ones, with a largest observed end-effector error of 2.98 cm.
 
-<div class="archive__item-teaser">
+<div class="archive__item-teaser" id="demo-video">
     <video autoplay loop muted playsinline width="100%" poster="/images/human_to_robot_poster.jpg" style="display:block; object-fit:cover;">
       <source src="/images/human_to_robot.mp4" type="video/mp4">
       Your browser cannot play this video. <a href="/images/human_to_robot.mp4">Download it here.</a>
     </video>
 </div>
 
-*Demonstration on the right, the simulated Torobo executing the decoded joint trajectory on the left. The targets shown lie between trained angles, so these are generalization cases rather than replays. The interface is described under Experiments. [Full video on YouTube](https://www.youtube.com/watch?v=71mbbTE65yU).*
+*Demonstration on the right, the simulated Torobo executing the decoded joint trajectory on the left. The ring around the hand follows the tracked keypoint and reports the state of the recording loop, turning green while a reach is being captured; the smaller rings are the seven training targets, drawn so that a reach can be aimed between them or past them. The targets shown lie between trained angles, so these are generalization cases rather than replays. [Full video on YouTube](https://www.youtube.com/watch?v=71mbbTE65yU).*
 
 ## Motivation
 
-Aktaş et al. [[1]](#ref-1) learn task-level correspondences between robots whose bodies differ. Each agent's sensorimotor trajectories are encoded by a Conditional Neural Movement Primitives network [[2]](#ref-2). The resulting latent representations are combined by convex combination into a common latent representation, and each agent's own decoder reconstructs its own trajectory from it:
+Aktaş et al. [\[1\]](#ref-1) learn task-level correspondences between robots whose bodies differ. Each agent's sensorimotor trajectories are encoded by a Conditional Neural Movement Primitives network [\[2\]](#ref-2). The resulting latent representations are combined by convex combination into a common latent representation, and each agent's own decoder reconstructs its own trajectory from it:
 
 $$L = p \cdot L^{\text{A}} + (1-p) \cdot L^{\text{B}}, \qquad p \sim U(0,1)$$
 
@@ -52,7 +52,7 @@ Two steps therefore precede encoding. A five-tap moving average is convolved alo
 
 ## Experiments
 
-Evaluation is interactive rather than scripted. The demonstrator sits in front of the camera, a reach is recorded, and the simulated arm executes the decoded trajectory immediately afterwards. In the video above, the ring around the hand follows the tracked keypoint and reports the state of that loop, turning green while a reach is being captured; the smaller rings are the seven training targets. Drawing the targets on screen is what allows a reach to be aimed deliberately between two of them, or past the end of the arc, which is how the results below were obtained.
+Evaluation is interactive rather than scripted. The demonstrator sits in front of the camera, a reach is recorded, and the simulated arm executes the decoded trajectory immediately afterwards. In [the video above](#demo-video), the ring around the hand follows the tracked keypoint and reports the state of that loop, turning green while a reach is being captured; the smaller rings are the seven training targets. Drawing the targets on screen is what allows a reach to be aimed deliberately between two of them, or past the end of the arc, which is how the results below were obtained.
 
 
 Targets between the trained angles are reached. Across the validation points tried by hand, the largest deviation between the target and the Torobo end effector, computed by forward kinematics on the predicted joint trajectory, was 2.98 cm. Reaches ending a few centimetres outside the arc covered by training also produced sensible trajectories, although this was observed rather than measured.
@@ -67,7 +67,7 @@ The robot side is a PyBullet simulation throughout. The generated joint angles w
 
 ## Future work
 
-Running the generated trajectories on the physical Torobo is the immediate step, and was the intended one before the internship ended. Beyond reaching, the architecture carries no information about objects: Aktaş et al. note that the geometric and visual properties of manipulated objects are not used by their model, and take that up separately in later work on affordance transfer [[3]](#ref-3). Transferring a grasp from a human hand to a gripper would need that addition rather than following from this one.
+Running the generated trajectories on the physical Torobo is the immediate step, and was the intended one before the internship ended. Beyond reaching, the architecture carries no information about objects: Aktaş et al. note that the geometric and visual properties of manipulated objects are not used by their model, and take that up separately in later work on affordance transfer [\[3\]](#ref-3). Transferring a grasp from a human hand to a gripper would need that addition rather than following from this one.
 
 ## Context
 
