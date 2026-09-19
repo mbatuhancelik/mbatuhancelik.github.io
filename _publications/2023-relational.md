@@ -6,7 +6,7 @@ authors: "Alper Ahmetoğlu, <b>Batuhan Çelik</b>, Erhan Öztop, Emre Uğur"
 permalink: /publication/2023-relational
 date: 2024-01-08
 venue: 'IEEE Robotics and Automation Letters (RA-L)'
-paperurl : "https://arxiv.org/abs/2309.00889"
+paperurl : "https://arxiv.org/pdf/2309.00889"
 description: "IEEE RA-L 2024. A deep architecture that discovers object symbols and explicit relational symbols from a robot's self-supervised interaction with a varying number of objects on a tabletop."
 ---
 
@@ -24,12 +24,13 @@ Second author. Carried out at the CoLoRs Lab, Boğaziçi University.
     width="100%" 
     controls 
     preload="metadata"
+    poster="/images/relational_deepsym_poster.jpg"
     style="border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.15); max-height: 480px; background: #000;">
-    <source src="https://aahmetoglu.com/static/relational_deepsym.mp4" type="video/mp4">
-    Your browser does not support the video tag.
+    <source src="/images/relational_deepsym.mp4" type="video/mp4">
+    Your browser cannot play this video. <a href="/images/relational_deepsym.mp4">Download it here.</a>
   </video>
   <p style="font-style: italic; color: #666; margin-top: 0.75rem; font-size: 0.95rem;">
-    Multi-object symbol discovery and effect prediction on the simulated UR10 tabletop platform.
+    Multi-object symbol discovery and effect prediction on the simulated UR10 tabletop platform. The closing real-robot segment is a demonstration, not a result reported in the paper. Video and real-robot work by Alper Ahmetoğlu.
   </p>
 </div>
 
@@ -40,11 +41,11 @@ Second author. Carried out at the CoLoRs Lab, Boğaziçi University.
   <p style="font-style: italic; color: #666; margin-top: 8px;">Fig. 1: The Relational DeepSym architecture. Object symbols and relational symbols are produced in parallel from the same object features, then aggregated with the executed action and decoded into per-object effects.</p>
 </div>
 
-The state vector is a set of object poses and types $\{o_1, \dots, o_n\}$, where $n$ varies from sample to sample. The model consists of four components: an encoder that transforms the state vector into fixed-size binary symbolic representations for each object, a self-attention module that outputs query and key vectors for each object, an aggregation function that combines information from multiple objects by multiplying object symbols with relational symbols, and a decoder that predicts the effect of the executed action for each object. The architecture is differentiable and trained end to end to minimize the effect prediction error, so the encoder and the self-attention module are expected to learn symbols and relations useful to the decoder.
+The state vector is a set of object poses and types $$\{o_1, \dots, o_n\}$$, where $$n$$ varies from sample to sample. The model consists of four components: an encoder that transforms the state vector into fixed-size binary symbolic representations for each object, a self-attention module that outputs query and key vectors for each object, an aggregation function that combines information from multiple objects by multiplying object symbols with relational symbols, and a decoder that predicts the effect of the executed action for each object. The architecture is differentiable and trained end to end to minimize the effect prediction error, so the encoder and the self-attention module are expected to learn symbols and relations useful to the decoder.
 
 **Object symbols.** The encoder processes the objects independently, outputting a set of discrete vectors treated as object symbols. To output a discrete vector without removing the differentiability, the activation of the last layer is set to the Gumbel-sigmoid function. Processing objects independently is what lets the model handle a changing number of objects naturally, which in the original DeepSym could only be achieved by fixing the number of input objects.
 
-**Relational symbols.** The self-attention module processes the same object features to output query and key vectors, and the attention weights are computed as $A = \text{GumbelSigmoid}(QK^T/\sqrt{d})$. This differs from regular self-attention, where a softmax is used, and the modification creates two behaviours: a sigmoid allows multiple attention weights to be active at the same time, whereas in softmax attentions compete with each other; and the Gumbel-sigmoid discretizes the weights while preserving differentiability, which allows them to be treated as relational symbols between objects. Four attention heads are used, modelling different relations.
+**Relational symbols.** The self-attention module processes the same object features to output query and key vectors, and the attention weights are computed as $$A = \text{GumbelSigmoid}(QK^T/\sqrt{d})$$. This differs from regular self-attention, where a softmax is used, and the modification creates two behaviours: a sigmoid allows multiple attention weights to be active at the same time, whereas in softmax attentions compete with each other; and the Gumbel-sigmoid discretizes the weights while preserving differentiability, which allows them to be treated as relational symbols between objects. Four attention heads are used, modelling different relations.
 
 In the preceding attentive architecture the self-attention module takes the encoder's object symbols as input and directly outputs the aggregated representation, restricting the model to learning attention weights only from the learned symbols. Here they are learned from object features, which makes the relations more general. Those weights were also continuous, and continuous weights cannot be easily expressed as relational symbols between objects.
 
@@ -64,7 +65,7 @@ I joined this project as a research intern, tasked with getting the preceding at
 
 The environment consists of a UR10 robot and two to four objects, either short blocks or long blocks. The robot has a single type of high-level action: grasping and releasing an object on top of or near another object. Three datasets containing exactly two, three and four objects are collected, with 120K, 180K and 240K samples, and a fourth combines them into a varying-object-count set. All architectures are trained for 4000 epochs with five repetitions using different seeds.
 
-Reported results are absolute errors summed over all dimensions, in centimetres, averaged over the five runs. Welch's t-test shows significant differences ($p < 0.02$ for all cases) between the proposed method and the others.
+Reported results are absolute errors summed over all dimensions, in centimetres, averaged over the five runs. Welch's t-test shows significant differences ($$p < 0.02$$ for all cases) between the proposed method and the others.
 
 | Dataset | Vanilla DeepSym | Attentive DeepSym | Relational DeepSym |
 | :--- | :---: | :---: | :---: |
@@ -75,15 +76,15 @@ Reported results are absolute errors summed over all dimensions, in centimetres,
 
 The variance is also lower than that of the others, indicating that Relational DeepSym is more robust to different seeds. Errors increase as the number of objects increases. This is expected since the number of unique effects increases with the number of objects as the robot creates more complex structures in random exploration; the paper names a guided exploration schedule as a promising future direction, which I pursued from two sides: externally, by having an LLM choose among the robot's available actions in [Developmental Scaffolding with Large Language Models](/publication/2023-icdl-scaffolding) (ICDL 2023), and internally, by deriving the signal from the learner's own predictive uncertainty in my [thesis](/projects/intrinsic_curiosity).
 
-Feeding the predicted effect back into the state vector allows the final state of an action sequence to be predicted. Relational DeepSym is more accurate than the others here, especially in the $z$ axis, the most significant axis in these experiments, showing that the model accounts for the presence of an object on top of another.
+Feeding the predicted effect back into the state vector allows the final state of an action sequence to be predicted. Relational DeepSym is more accurate than the others here, especially in the $$z$$ axis, the most significant axis in these experiments, showing that the model accounts for the presence of an object on top of another.
 
 ## Interpreting the learned symbols
 
 Because the symbols are discrete, the states that activate each of them can be collected and inspected directly.
 
-One object symbol is activated only with long blocks, while the others respond to short blocks; among those, some are activated for short blocks below the grasped object and others for short blocks above it, the positions being relative to the grasped object. These symbol groundings show that the object type and the relative $z$-axis position are the most significant factors in predicting the effect. No symbol is specialized on the $x$-axis position, as it does not bring any additional advantage for the effect prediction.
+One object symbol is activated only with long blocks, while the others respond to short blocks; among those, some are activated for short blocks below the grasped object and others for short blocks above it, the positions being relative to the grasped object. These symbol groundings show that the object type and the relative $$z$$-axis position are the most significant factors in predicting the effect. No symbol is specialized on the $$x$$-axis position, as it does not bring any additional advantage for the effect prediction.
 
-Among the relational symbols, one is activated only when objects are aligned within the $y$ axis. This suits the environment, since objects are only aligned when they are mostly on top of each other, and the alignment helps the model differentiate between two stacks built from the same set of objects. The remaining relations are activated for a wide range of relative positions and object types, suggesting they are not as significant.
+Among the relational symbols, one is activated only when objects are aligned within the $$y$$ axis. This suits the environment, since objects are only aligned when they are mostly on top of each other, and the alignment helps the model differentiate between two stacks built from the same set of objects. The remaining relations are activated for a wide range of relative positions and object types, suggesting they are not as significant.
 
 The next step named in the paper is to convert the learned symbols into PDDL operators for domain-agnostic planning, which would remove the cascading of errors in action sequence prediction and allow a fast search in symbolic space without a neural network.
 
