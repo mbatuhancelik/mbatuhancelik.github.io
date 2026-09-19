@@ -15,7 +15,7 @@ I hold a B.S. in Computer Engineering from Boğaziçi University (GPA **3.68**/4
 The through-line is representations that are structured enough to plan over and grounded enough to be learned without labels. Robotics has been my testbed, but the questions are not specific to it, and I would as readily pursue them in **visual question answering**, **reinforcement learning**, or **multimodal models** as on a manipulator.
 
 ---
-
+<!-- TODO (Batuhan): align this section with your actual next work targets. -->
 ## What I want to work on next
 
 Relational DeepSym learns symbols that predict effects. It does not learn symbols that survive intervention — and under passive data those two things are indistinguishable. A model that predicts "the tower falls" from a correlated visual cue and a model that has actually represented the support relation score identically on a held-out test set, and behave very differently the first time a robot pushes something.
@@ -37,7 +37,7 @@ Selected reading:
 
 ## Research & Selected Projects
 
-* **Neurosymbolic world models** (*RA-L 2024*): proposed the relational symbols formulation behind *Relational DeepSym*, which uses Gumbel-Sigmoid self-attention to extract sparse binary relational symbols for multi-object effect prediction.
+* **Neurosymbolic world models** (*RA-L 2024*): proposed and named the relational symbols formulation behind *Relational DeepSym*, which uses Gumbel-Sigmoid self-attention to extract sparse binary relational symbols for multi-object effect prediction. Second author; the working implementation is my co-author Alper Ahmetoğlu's.
 * **LLM scaffolding for embodied agents** (*ICDL 2023*): first-authored a study of LLMs as automated scaffolding agents for robot exploration. GPT-3.5 guidance beats random exploration on cubes and fails on spheres, which it repeatedly treats as a stable base.
 * **Intrinsic motivation for deep symbol learning** (*B.S. thesis*): an ensemble-disagreement active exploration framework. Matched-sample planning accuracy rises from 52% to 62%; the same policy reaches 58% on 23% fewer samples than the baseline needs for 52%.
 * **Cross-embodiment skill transfer**: extended Blending-CNMPs to map vision-tracked human motion into Torobo joint-space trajectories.
@@ -51,9 +51,16 @@ Selected reading:
 
 My research direction came out of a specific afternoon at CoLoRs. A colleague was building a Lego tower out of hundreds of blocks while our symbol-discovery models were struggling with four objects. Alper Ahmetoğlu and I looked at that tower and decided a robot doing the same thing was the goal worth aiming at.
 
-Eight months of failed iterations later, I traced the information flow through the network and found where it was losing the structure. The model computed its relations from symbols the encoder had already produced, so it could never represent a relation the encoder had missed — and two scenes built from the same blocks in different arrangements collapsed to one representation. That is a structural limit, not a tuning problem, which is why more data had not helped. The fix I specified, and named, became **Relational DeepSym**.
+Eight months of failed iterations later, I traced the information flow through the network and found where it was losing the structure. The model computed its relations from symbols the encoder had already produced, so it could never represent a relation the encoder had missed — and two scenes built from the same blocks in different arrangements collapsed to one representation. That is a structural limit, not a tuning problem, which is why more data had not helped. The fix I specified, and named, became **Relational DeepSym**. I did not build it; the working implementation in the paper is Alper Ahmetoğlu's.
 
-Solving the representation exposed the next wall, which was data. Effect prediction error kept climbing with the object count even as the datasets grew alongside it: 240,000 samples for four objects with the error still rising, and later a six-object environment that would not train on a million. A simple combinatorial argument explains why — the probability of randomly stumbling into a specific $n$-object interaction falls off roughly as $1/n!$ — so almost everything being collected was the same trivial event again.
+Solving the representation exposed the next wall, which was data. Effect prediction error kept climbing with the object count even as the datasets grew alongside it: 240,000 samples for four objects with the error still rising, and later, in experiments I ran after the paper was published, a six-object environment that would not train on a million. The reason is that the probability of randomly reaching a specific $$n$$-object interaction falls off exponentially in $$n$$, so almost everything being collected was the same trivial event again.
+
+<!-- TODO (Batuhan): "would not train on a million" needs the failure mode, in your own words —
+     what a reader should picture. The identical sentence is on the thesis page
+     (_projects/intrinsic_curiosity.md, Motivation), with the same TODO; change both together.
+     The 1/n! claim that used to be in this paragraph is gone: neither the report nor either paper
+     derives a factorial, and both say the probability falls exponentially. Restore a closed form
+     only alongside the counting argument that produces it. -->
 
 My internship at SISReC was my way into the cognitive and developmental learning literature, and it gave me the response: stop sampling harder and start choosing. I pitched an intrinsic-curiosity approach to Assoc. Prof. Emre Uğur as my B.S. thesis. The resulting agent explores 5-to-10-object environments and finds interactions — including object rotations it was never given a primitive for — that random exploration essentially never reaches.
 
