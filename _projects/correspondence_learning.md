@@ -1,21 +1,20 @@
 ---
-title: "Human-to-Robot Skill Transfer with Blending CNMPs"
+title: "Human-to-Robot Skill Transfer through Correspondence Learning"
 collection: projects
 header:
     video_teaser: '/images/human_to_robot.mp4'
 date: 2023-08-28
-excerpt: 'Extending the Blending-CNMP framework to noisy, vision-based human demonstrations — bridging the embodiment and Cartesian-to-joint-space gap to transfer reaching skills between a human and the Torobo manipulator.'
-description: "Extending Blending-CNMPs to vision-tracked human demonstrations, transferring reaching skills between a human demonstrator and the Torobo manipulator across the Cartesian-to-joint-space gap. Osaka University, SISReC."
+excerpt: "Extending the correspondence-learning framework of Aktaş et al. from robot-to-robot transfer to a human demonstrator tracked by camera. Seven demonstrations are enough to reach targets between the trained ones, with a largest observed end-effector error of 2.98 cm."
+description: "Independent project at SISReC, Osaka University: transferring reaching skills from a camera-tracked human demonstrator to a simulated Torobo humanoid through a common latent representation, across a Cartesian-to-joint-space gap."
 ---
 
-> **Note:** This is an independent project extending [Aktaş et al. (2023)](https://arxiv.org/abs/2310.13458). I am **not an author** on that paper — see [Context](#context) below.
+> Note: this is an independent project extending [Aktaş et al. (2024)](https://doi.org/10.1109/LRA.2024.3382534). I am not an author on that paper; see [Context](#context) below.
 
+Independent project, carried out during a summer research internship at SISReC, Osaka University, supervised by Prof. Erhan Öztop.
 
 ## Abstract
 
-This project extends the Blending Conditional Neural Movement Primitives (Blending-CNMP) framework — originally validated only on clean, simulated robot-to-robot data — to a human-in-the-loop setting. Human reaching movements were captured with an Intel RealSense camera and MediaPipe, which introduces low-frequency drift that the blending-CNMP encoder proved highly sensitive to. A filtering and normalization pipeline conditions these trajectories before encoding, allowing the shared latent space to converge. The result is bidirectional skill transfer between a human demonstrator and the Torobo manipulator (with the robot → human direction validated numerically only), mapping human Cartesian coordinates to Torobo joint-space trajectories on unseen, interpolated targets.
-
-[Code on GitHub](https://github.com/mbatuhancelik/human2robot_cnmp)
+Aktaş et al. learn task-level correspondences between robots with different bodies by blending the latent representations of each agent's Conditional Neural Movement Primitives into one common representation, from which either agent's trajectory can be decoded. Their conclusion names humans among the agents worth testing next. This project does that. A human reaching movement is captured with an Intel RealSense camera and MediaPipe, and the same architecture maps it onto joint trajectories for a simulated Torobo humanoid. Camera-tracked trajectories carry a slow drift that the encoder does not tolerate, and training on raw landmarks does not converge; a five-tap moving average and a per-trajectory geometric normalization condition them first. Trained on seven demonstrations at targets 30° apart, the model reaches targets lying between the trained ones, with a largest observed end-effector error of 2.98 cm.
 
 <div class="archive__item-teaser">
     <video autoplay loop muted playsinline width="100%" poster="/images/human_to_robot_poster.jpg" style="display:block; object-fit:cover;">
@@ -24,89 +23,64 @@ This project extends the Blending Conditional Neural Movement Primitives (Blendi
     </video>
 </div>
 
-*Demo: human → robot transfer on a validation target **between** two trained angles — a generalization test, not a replay of a trained motion. The robot → human direction was validated numerically only.*
+*Demonstration on the right, the simulated Torobo executing the decoded joint trajectory on the left. The targets shown lie between trained angles, so these are generalization cases rather than replays. The interface is described under Experiments. [Full video on YouTube](https://www.youtube.com/watch?v=71mbbTE65yU).*
 
----
+## Motivation
 
-## Motivation & Methodological Context
+Aktaş et al. [[1]](#ref-1) learn task-level correspondences between robots whose bodies differ. Each agent's sensorimotor trajectories are encoded by a Conditional Neural Movement Primitives network [[2]](#ref-2). The resulting latent representations are combined by convex combination into a common latent representation, and each agent's own decoder reconstructs its own trajectory from it:
 
-The core foundation of this project builds directly upon the Blending-CNMP framework introduced by Aktaş et al. (2023) for learning correspondences across morphologically different robots.
+$$L = p \cdot L^{\text{A}} + (1-p) \cdot L^{\text{B}}, \qquad p \sim U(0,1)$$
 
-<div style="text-align: center; margin: 20px auto; max-width:100%;">
-<img src="/images/blending_cnmp_arch.png" alt="Blending-CNMP Architecture Overview" style="width:95%; display:block; margin:20px auto;">
-  <p style="font-style: italic; color: #666; margin-top: 8px;">Figure: Blending-CNMP architecture mapping conditional observations from diverse morphologies into a shared representation space. Taken from <a href="https://arxiv.org/abs/2310.13458">(Aktaş et al. 2023)</a></p>
-</div>
+Setting $$p$$ to 1 at inference makes that agent the source: its observations alone produce the common representation, and the other agent's trajectory is decoded from the same latent. The paper demonstrates this between manipulators and a differential-drive mobile robot.
 
-As illustrated above, sparse conditional observations from each agent's trajectory ($$S^A_t$$ and $$S^B_t$$) are passed through agent-specific encoders ($$E^A$$ and $$E^B$$) and aggregated to produce distinct latent vectors $$L^A$$ and $$L^B$$. These latents are subsequently combined into a single, unified shared representation space ($$L$$) via a randomly-weighted convex combination using a blending parameter $$p$$ sampled uniformly during training:
-
-$$L = p \cdot L^A + (1-p) \cdot L^B \quad \text{where} \quad p \sim U(0,1)$$
-
-*(Note: While the generalized framework supports $$n$$-way combinations for multiple morphologies, this two-agent derivation directly matches our experimental setup).*
-
-Given a target query timestamp ($$t_{\text{target}}$$), the shared representation is processed by agent-specific decoders ($$Q^A$$ and $$Q^B$$) to predict the trajectory mean ($$\mu$$) and variance ($$\sigma$$). At inference time, task-level skill transfer is achieved symmetrically by forcing the blending weight of the source agent to 1 (and the target to 0). The shared representation is generated purely from the source's observations and decoded through the target agent's specific decoder.
-
-The baseline framework works well across simulated robot pairs, but it assumes every agent's trajectories are clean, high-frequency sensorimotor streams. Vision-tracked human demonstrations violate that assumption badly enough to prevent the latent space from converging at all.
-
-## Methodology
-
-### 1. Vision-Based Trajectory Capture
-* **Hardware Setup:** Human arm-reaching movements were recorded in 3D Cartesian space using an Intel RealSense depth camera.
-* **Keypoint Extraction:** Hand and wrist coordinates were tracked dynamically using MediaPipe, bypassing the need for intrusive motion-capture suits or manual kinesthetic teaching.
-
-**Workspace & Task Layout:**
-The experimental environment was mapped out systematically to test spatial interpolation and coordinate transfer:
-* **The Trajectory Bounds:** The workspace consists of one shared **start position** (large green circle) and multiple **target positions** (small yellow circles) arranged in a **180° half-circle array**.
-* **Training Data:** The network was trained on **7 distinct trajectories** spaced exactly **30° apart** across the full half-circle. 
-* **Data Capture:** For human demonstrations, the tester moved their hand from the start position to a designated target while MediaPipe's real-time pose tracking extracted the Cartesian hand trajectory. For the robot side, matching Torobo trajectories were generated via inverse kinematics and logged directly in joint space.
+Its conclusion names the next case as agents whose sensorimotor dimensions differ more widely, "such as humanoids, musculoskeletal robots, and even humans." A camera-tracked human is that case, and an extreme one. The demonstrator's trajectory is two image-plane coordinates; the Torobo's is five joint angles. Nothing in the architecture converts between them, so the common latent representation has to absorb an inverse-kinematics mapping along with the difference in bodies.
 
 <div style="text-align: center; margin: 20px auto; max-width:100%;">
-<img src="/images/collection_data_collection_setup.png" alt="Data collection setup showing MediaPipe pose tracking with a start circle and target circles" style="width:85%; display:block; margin:20px auto;">
-  <p style="font-style: italic; color: #666; margin-top: 8px;">Figure: Human demonstration capture setup. The green circle marks the shared start position; yellow circles denote the 30°-spaced targets. Red dots and white skeleton lines represent the real-time MediaPipe keypoints used to extract Cartesian hand trajectories.</p>
+<img src="/images/blending_cnmp_arch.png" alt="Architecture diagram: sampled observations from each agent pass through separate encoders into per-agent latent vectors, which are combined by weighted sum into one common latent representation, and each agent's decoder reads that representation together with a query timestamp to output a trajectory mean and variance." style="width:95%; display:block; margin:20px auto;">
+  <p style="font-style: italic; color: #666; margin-top: 8px;">Fig. 1: The correspondence-learning architecture. Sparse observations from each agent are encoded separately, combined into a common latent representation, and decoded through each agent's own decoder. Reproduced from <a href="https://arxiv.org/abs/2310.13458">Aktaş et al. (2024)</a>.</p>
 </div>
 
-### 2. Overcoming Low-Frequency Noise
-Robot joint logs and vision-tracked human trajectories are noisy in qualitatively different ways. Robot streams carry high-frequency jitter around a correct nominal path, which the CNMP architecture inherently tolerates. MediaPipe trajectories, however, introduce **substantial low-frequency noise, slow spatial drift, and systematic tracking wobbles**. 
+## Method
 
-Because the CNMP encoder summarizes whole trajectory shapes, it proved highly sensitive to these low-frequency deviations. Initial training attempts using raw MediaPipe data failed to converge.
-* **Conditioning Pipeline:** I developed a dedicated filtering and normalization pipeline that isolates and suppresses low-frequency drift.
-* **Statistical Alignment:** This preprocessing stage reshapes raw Cartesian vision inputs into clean geometric trajectories that match the statistical properties of the robot encoder, allowing the shared latent space to converge successfully.
+**Capture.** Reaching movements are recorded with an Intel RealSense camera, and MediaPipe's pose model supplies the landmarks. The model consumes a single hand keypoint, which in practice sits near the base of the fingers rather than at the wrist or a fingertip, since the pose model estimates hand position from body context rather than running a dedicated hand model. The workspace is one shared start position with targets arranged along a 180° arc. Seven demonstrations are recorded, one per target, at 30° spacing. Matching Torobo trajectories are generated by inverse kinematics and logged in joint space; five of the arm's seven joints are used.
 
-### 3. Deep Cartesian-to-Joint-Space Embodiment Mapping
-The learned latent space was forced to bridge two distinct domain gaps simultaneously:
-* **The Embodiment Gap:** Mapping a biological human arm structure to the rigid, highly articulated linkages of the Torobo manipulator.
-* **The Kinematic Space Gap:** The human model operates entirely on **Cartesian wrist coordinates**, whereas the Torobo model trains and decodes **directly within its joint space**. The shared representation must therefore implicitly embed an inverse kinematics mapping natively within the cross-embodiment correspondence.
+**Conditioning.** Robot joint logs and camera-tracked trajectories are noisy in different ways. Robot streams carry high-frequency jitter around a correct nominal path, which the encoder tolerates. MediaPipe trajectories drift slowly instead, and because the encoder summarizes whole trajectory shapes rather than individual samples, that drift changes the shape being encoded. Training on raw landmarks did not converge.
 
----
+Two steps therefore precede encoding. A five-tap moving average is convolved along each trajectory, which suppresses the drift. Each trajectory is then translated so that its first sample lies at the origin and divided by its own maximum radius, placing its farthest point on the unit circle; at inference the scale factor is the average taken from the training set. This removes where the demonstrator sat and how far they reached, which is what makes a camera trajectory comparable with a joint-space one.
 
-## Results
+**Transfer.** A recorded reach is resampled to thirty timesteps and conditioned as above, and five of those timesteps are sampled at random as observations. The blending weight is set to 1 on the human side, so the common latent representation is formed from the human observations alone, and the Torobo decoder produces the joint trajectory the simulated arm then executes.
 
-Trained on 7 trajectories at 30°-spaced targets, the model was evaluated on interpolated targets between trained angles — a genuine generalization test rather than a replay of a trained motion. Transfer succeeded in both directions on these held-out targets:
+## Experiments
 
-| Transfer Direction | Evaluation | Error measured |
-| :--- | :---: | :--- |
-| Human → Torobo | Video demo + trajectory comparison | ~3 cm between the decoded Torobo end-effector position (forward kinematics on the predicted joint trajectory) and the target |
-| Torobo → Human | Numerical comparison only | ~3 cm between the decoded Cartesian wrist trajectory and the held-out MediaPipe wrist track |
+Evaluation is interactive rather than scripted. The demonstrator sits in front of the camera, a reach is recorded, and the simulated arm executes the decoded trajectory immediately afterwards. In the video above, the ring around the hand follows the tracked keypoint and reports the state of that loop, turning green while a reach is being captured; the smaller rings are the seven training targets. Drawing the targets on screen is what allows a reach to be aimed deliberately between two of them, or past the end of the arc, which is how the results below were obtained.
 
-The two rows measure different things and happen to land at a similar magnitude. On the human side there is no physical end effector, so "error" is the deviation of the predicted wrist keypoint from the recorded one; on the robot side it is a position error in the workspace.
+
+Targets between the trained angles are reached. Across the validation points tried by hand, the largest deviation between the target and the Torobo end effector, computed by forward kinematics on the predicted joint trajectory, was 2.98 cm. Reaches ending a few centimetres outside the arc covered by training also produced sensible trajectories, although this was observed rather than measured.
+
+## Limitations
+
+Seven demonstrations from one demonstrator, one per target. No validation set was collected, so 2.98 cm is the largest error seen while trying targets by hand in an interactive session, not a statistic over held-out data. The extrapolation behaviour comes from the same sessions and is not quantified.
+
+The reverse direction is implemented: decoding the common latent through the human decoder renders predicted landmarks. It was inspected on training trajectories only, never scored on held-out data, and those measurements no longer exist. A human also cannot be asked to execute a trajectory the way a robot can, so the reverse direction is a check on the latent representation rather than a transfer of skill.
+
+The robot side is a PyBullet simulation throughout. The generated joint angles were never executed on the physical Torobo, so what the results support is that the model produces joint trajectories the simulator accepts, not that they are correct on hardware.
+
+## Future work
+
+Running the generated trajectories on the physical Torobo is the immediate step, and was the intended one before the internship ended. Beyond reaching, the architecture carries no information about objects: Aktaş et al. note that the geometric and visual properties of manipulated objects are not used by their model, and take that up separately in later work on affordance transfer [[3]](#ref-3). Transferring a grasp from a human hand to a gripper would need that addition rather than following from this one.
 
 ## Context
 
-This project was completed during a summer research internship at **SISReC, Osaka University**, supervised by **Prof. Erhan Öztop**. The idea came from a discussion with **Prof. Minoru Asada** during a lab presentation, as a possible real-robot extension of the blending-CNMP paper's experiments. The paper it builds on was posted to arXiv in October 2023, after this project's date — I worked from the group's in-progress version while in the lab that summer. My internship ended before real-hardware trials were possible, and given the paper's already-substantial scope, we agreed not to add another contributor for a simulation-only result. This remains an independent project, not part of the publication.
+This project was completed during a summer research internship at SISReC, Osaka University, supervised by Prof. Erhan Öztop. The idea came from a discussion with Prof. Minoru Asada during a lab presentation, as a possible real-robot extension of the correspondence-learning experiments. The paper it builds on was posted to arXiv in October 2023 and published in RA-L in May 2024, both after this project's date, so I worked from the group's in-progress version while in the lab that summer. My internship ended before real-hardware trials were possible, and given the paper's already considerable scope, we agreed not to add another contributor for a simulation-only result. This remains an independent project, not part of the publication.
 
-## Citation
+## Code
 
-```bibtex
-@article{aktas2023correspondence,
-  title={Correspondence learning between morphologically different robots via task demonstrations},
-  author={Aktas, Hakan and Nagai, Yukie and Asada, Minoru and Oztop, Erhan and Ugur, Emre},
-  journal={arXiv preprint arXiv:2310.13458},
-  year={2023}
-}
+[github.com/mbatuhancelik/human2robot_cnmp](https://github.com/mbatuhancelik/human2robot_cnmp)
 
-@inproceedings{seker2019conditional,
-  title={Conditional neural movement primitives},
-  author={Seker, M. Yunus and Imre, Mert and Piater, Justus H. and Ugur, Emre},
-  booktitle={Robotics: Science and Systems (RSS)},
-  year={2019}
-}
-```
+## References
+
+<a id="ref-1"></a>[1] H. Aktaş, Y. Nagai, M. Asada, E. Öztop, and E. Uğur, "Correspondence Learning Between Morphologically Different Robots via Task Demonstrations," *IEEE Robotics and Automation Letters*, vol. 9, no. 5, pp. 4463–4470, May 2024. DOI: [10.1109/LRA.2024.3382534](https://doi.org/10.1109/LRA.2024.3382534)
+
+<a id="ref-2"></a>[2] M. Y. Seker, M. Imre, J. H. Piater, and E. Uğur, "Conditional Neural Movement Primitives," in *Robotics: Science and Systems (RSS)*, vol. 10, 2019.
+
+<a id="ref-3"></a>[3] H. Aktaş, Y. Nagai, M. Asada, M. Saveriano, E. Öztop, and E. Uğur, "Cross-Embodied Affordance Transfer through Learning Affordance Equivalences," arXiv:2404.15648, 2024.
