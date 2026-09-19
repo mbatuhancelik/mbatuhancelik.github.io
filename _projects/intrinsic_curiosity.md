@@ -8,7 +8,6 @@ excerpt: 'An active exploration policy for Relational DeepSym that replaces unif
 description: "Undergraduate graduation project: replacing uniform random exploration in the Relational DeepSym world model with an ensemble-disagreement signal. 10 percentage points higher planning accuracy at equal sample counts, and an emergent rotation absent from the action repertoire."
 ---
 
-
 Undergraduate graduation project (CMPE 492), Boğaziçi University. Advisors: Assoc. Prof. Emre Uğur and Alper Ahmetoğlu, CoLoRs Lab. Follow-up to [Discovering Predictive Relational Object Symbols with Symbolic Attentive Layers](/publication/2023-relational) [\[1\]](#ref-1) (IEEE RA-L 2024), of which I am a co-author.
 
 ## Abstract
@@ -24,13 +23,13 @@ Relational DeepSym [\[1\]](#ref-1) learns object and relational symbols from the
 
 ## Motivation
 
-In the preceding work [\[1\]](#ref-1), effect prediction error rises from 0.50 cm with two objects to 1.67 cm with three and 2.00 cm with four, although the corresponding datasets contain 120K, 180K and 240K samples respectively. Scaling the sample count with the object count does not arrest the degradation, which suggests that the additional samples are not distributed over the states that matter. In experiments run after publication, training on a six-object environment failed even with one million samples. The number of distinct effects grows with the number of objects, and the composite structures producing those effects are rare under a uniform policy. That paper identifies a guided exploration schedule as a promising direction; the present work follows it. Our previous work, [Developmental Scaffolding with Large Language Models](/publication/2023-icdl-scaffolding) (ICDL 2023), addresses the same bottleneck from outside the learner, using an LLM to choose among the actions the robot can execute. This project derives the guidance signal from the learner's own predictive uncertainty instead, which removes the dependence on a model that already knows something about the world.
+In the preceding work [\[1\]](#ref-1), effect prediction error rises from 0.50 cm with two objects to 1.67 cm with three and 2.00 cm with four, although the corresponding datasets contain 120K, 180K and 240K samples respectively. Scaling the sample count with the object count does not arrest the degradation, which suggests that the additional samples are not distributed over the states that matter. In experiments run after publication, the random exploration policy failed to discover enough samples to learn eight-object structures even with one million samples. The number of distinct effects grows with the number of objects, and the composite structures producing those effects are rare under a uniform policy. That paper identifies a guided exploration schedule as a promising direction; the present work follows it.
 
-Two inefficiencies motivate the change. First, most samples collected by a random policy repeat transitions that are already predicted correctly and therefore carry no information, while consuming interaction time. Second, even when sufficient rare samples are eventually accumulated by brute force, the resulting dataset is unbalanced, and the surplus of high-probability samples contributes nothing further to training.
+The cost of this falls on data collection rather than on training. Once an interaction has been sampled enough times the model learns it, so the informative portion of a randomly collected dataset stops growing long before the dataset does, and every further sample of an already-predicted transition still costs an execution. If an interaction occurs with probability $p$ under a uniform policy, obtaining the samples it needs takes on the order of $1/p$ executions, each a pick-and-place carried out in simulation or on hardware. Adding objects lowers $p$ for every composite interaction at once, so the budget required to cover the environment grows while the useful fraction of what is collected falls. The obstacle is simulation time, training time and energy rather than any property of the model.
 
 ## Method
 
-Let $D$ be a dataset of state-action-effect triplets and $\{f_0, \dots, f_k\}$ a set of forward models trained on overlapping subsets of $D$. If $D$ contains sufficiently many samples of a given transition, most members will learn it; conversely, disagreement among members on a state-action pair indicates that the pair is not yet learned and that further samples of it will reinforce training. This is the argument underlying Query by Committee [\[2\]](#ref-2), and it has been applied to exploration by Pathak et al. [\[3\]](#ref-3) and by Sancaktar et al. [\[4\]](#ref-4). The motivation signal for a candidate action sequence is the trace of the covariance across the flattened predictions of the council:
+Let $$D$$ be a dataset of state-action-effect triplets and $$\{f_0, \dots, f_k\}$$ a set of forward models trained on overlapping subsets of $$D$$. If $$D$$ contains sufficiently many samples of a given transition, most members will learn it; conversely, disagreement among members on a state-action pair indicates that the pair is not yet learned and that further samples of it will reinforce training. This is the argument underlying Query by Committee [\[2\]](#ref-2), and it has been applied to exploration by Pathak et al. [\[3\]](#ref-3) and by Sancaktar et al. [\[4\]](#ref-4). The motivation signal for a candidate action sequence is the trace of the covariance across the flattened predictions of the council:
 
 $$motivation(s, a_i, \{f_0, \dots, f_k\}) = \sum \text{trace}\left(\text{cov}\begin{bmatrix} \text{predict}(f_0(s, a_0, \dots, a_i)) \\ \vdots \\ \text{predict}(f_k(s, a_0, \dots, a_i)) \end{bmatrix}\right)$$
 
@@ -59,13 +58,19 @@ Two configurations were evaluated. The single-horizon policy sets the search dep
 
 Accuracies are averaged over seven randomly collected test sets. At equal sample counts the single-horizon council is approximately 10 percentage points ahead. Generation 4 of the single-horizon policy exceeds generation 6 of the baseline while training on 12k fewer samples.
 
-Evaluated on the actively collected test sets, all councils, including those trained under the active policy, score lower than on the randomly collected sets, and the variance across sets is markedly higher. Both observations support the claim that the active policy samples a different and less homogeneous distribution, and indicate that the improvement above is not an artifact of a test distribution favouring the curious councils.
+Evaluated on the actively collected test sets, all councils, including those trained under the active policy, score lower than on the randomly collected sets, and the variance across sets is higher. Both observations support the claim that the active policy samples a different and less homogeneous distribution, and indicate that the improvement above is not an artifact of a test distribution favouring the curious councils.
 
-Themes in the collected data are traceable through Cartesian coordinates alone. Grasp success falls sharply in generation 1 and recovers thereafter, indicating that failing grasps are initially the least predictable outcomes available. From generation 2 onward the policy shifts toward multi-object movement, in which a wide block is used as a tray to displace several objects at once.
+Themes in the collected data are traceable through Cartesian coordinates alone, and two of them mark successive phases of the exploration. Grasp success falls sharply in generation 1 and recovers thereafter, indicating that failing grasps are initially the least predictable outcomes available. Once that boundary is resolved the policy moves on: multi-object movement, in which a wide block is used as a tray to displace several objects at once, rises after generation 1 and peaks in generation 2 at roughly six times the seed level, remaining above the first two generations for the rest of the run.
 
-<div style="text-align: center; margin: 20px auto; max-width:100%;">
-<img src="/images/grasp_rate.png" alt="Successful grasp rate per generation, falling to approximately 0.37 in generation 1 and remaining near 0.9 in all others." style="width:95%; display:block; margin:20px auto;">
-  <p style="font-style: italic; color: #666; margin-top: 8px;">Fig. 2: Successful grasp rate across generations. The drop in generation 1 reflects active exploration of failing grasps.</p>
+<div style="display: flex; align-items: flex-start; justify-content: space-between; gap: 1.5rem; margin: 2rem 0; flex-wrap: wrap;">
+  <div style="flex: 1; min-width: 320px; text-align: center;">
+    <img src="/images/grasp_rate.png" alt="Successful grasp rate per generation, falling to approximately 0.37 in generation 1 and remaining near 0.9 in all others." style="width:100%; display:block;">
+    <p style="font-style: italic; color: #666; margin-top: 8px; font-size: 0.85rem;">Fig. 2: Successful grasp rate across generations. The drop in generation 1 reflects active exploration of failing grasps.</p>
+  </div>
+  <div style="flex: 1; min-width: 320px; text-align: center;">
+    <img src="/images/multi_object_movement.png" alt="Number of samples containing multi-object movement per generation, rising from about 59 in generation 0 to about 355 in generation 2 and settling between 143 and 240 afterwards." style="width:100%; display:block;">
+    <p style="font-style: italic; color: #666; margin-top: 8px; font-size: 0.85rem;">Fig. 3: Samples involving multi-object movement across generations. Attention shifts to using a wide block as a tray once grasp failures are predictable.</p>
+  </div>
 </div>
 
 ## Emergent interactions
@@ -77,7 +82,7 @@ Rotation is not among the action primitives, which permit only grasping and plac
     <source src="/images/tall_cut_demo_fixed.mp4" type="video/mp4">
     Your browser cannot play this video. <a href="/images/tall_cut_demo_fixed.mp4">Download it here.</a>
   </video>
-  <p style="font-style: italic; color: #666; margin-top: 8px;">Fig. 3: Emergent rotation. A controlled collapse yields a configuration absent from the training distribution.</p>
+  <p style="font-style: italic; color: #666; margin-top: 8px;">Fig. 4: Emergent rotation. A controlled collapse yields a configuration absent from the training distribution.</p>
 </div>
 
 A second theme is interaction with the base of a composite structure. Since the primitives are top-down, targeting a foundational block displaces the objects resting above it. Predicting such a transition requires resolving several tiers of relations, which is where Relational DeepSym is weakest and where council disagreement is correspondingly highest.
@@ -87,7 +92,7 @@ A second theme is interaction with the base of a composite structure. Since the 
     <source src="/images/complex_cut_demo.mp4" type="video/mp4">
     Your browser cannot play this video. <a href="/images/complex_cut_demo.mp4">Download it here.</a>
   </video>
-  <p style="font-style: italic; color: #666; margin-top: 8px;">Fig. 4: Manipulation of a multi-tier structure through its foundation, requiring prediction over nested relations.</p>
+  <p style="font-style: italic; color: #666; margin-top: 8px;">Fig. 5: Manipulation of a multi-tier structure through its foundation, requiring prediction over nested relations.</p>
 </div>
 
 ## Negative results
@@ -102,15 +107,16 @@ Extending the horizon did not improve on the single-horizon policy. Although lon
 
 Results come from a single seed in one environment without repeated runs; the gap is consistent across all seven test sets, but no error bars can be reported. Budgets were capped to expose sample efficiency, so neither policy was run to convergence and the ceiling of the method is unknown.
 
-The two policies have not been combined, and the horizon parameters remain unswept. Introducing bias toward existing clusters and tall assemblies in action selection would target composite structures directly, though the literature disagrees on whether such bias is necessary [\[5\]](#ref-5), [\[6\]](#ref-6). Internal results in the laboratory indicate that removing the Gumbel-sigmoid [\[7\]](#ref-7), [\[8\]](#ref-8) discretization improves both training speed and prediction accuracy, suggesting exploration without discretization followed by training of discretized models for planning. Finally, Relational DeepSym is retrained from scratch at each generation; incremental symbol learning [\[9\]](#ref-9) would allow successive generations to reuse what earlier ones acquired.
+The two policies have not been combined, and the horizon parameters remain unswept. Introducing bias toward existing clusters and tall assemblies in action selection would target composite structures directly, though the literature disagrees on whether such bias is necessary [\[5\]](#ref-5), [\[6\]](#ref-6). Internal results in the laboratory indicate that removing the Gumbel-sigmoid [\[7\]](#ref-7), [\[8\]](#ref-8) discretization improves both training speed and prediction accuracy, suggesting exploration without discretization followed by training of discretized models for planning. Finally, Relational DeepSym is retrained from scratch at each generation; incrementing on learned symbols, as in NS-CL[\[9\]](#ref-9), would allow successive generations to reuse what earlier ones acquired.
+
 
 ## Code
 
-The codebase is forked from the private repository of the preceding work and cannot be released publicly. Access is available on request: batuhancelik.boun@gmail.com
+The codebase is forked from the private repository of the preceding work and cannot be released publicly. Code and the full project report are available on request: batuhancelik.boun@gmail.com
 
 ## References
 
-<a id="ref-1"></a>[1] A. Ahmetoglu, B. Celik, E. Oztop, and E. Ugur, "Discovering predictive relational object symbols with symbolic attentive layers," *IEEE Robotics and Automation Letters*, 2024. [arXiv:2309.00889](https://arxiv.org/abs/2309.00889)
+<a id="ref-1"></a>[1] A. Ahmetoglu, B. Celik, E. Oztop, and E. Ugur, "Discovering predictive relational object symbols with symbolic attentive layers," *IEEE Robotics and Automation Letters*, vol. 9, no. 2, pp. 1977–1984, Feb. 2024. [DOI: 10.1109/LRA.2024.3350994](https://doi.org/10.1109/LRA.2024.3350994) · [arXiv:2309.00889](https://arxiv.org/abs/2309.00889)
 
 <a id="ref-2"></a>[2] H. S. Seung, M. Opper, and H. Sompolinsky, "Query by committee," in *Proceedings of the Fifth Annual Workshop on Computational Learning Theory*, 1992, pp. 287–294.
 
