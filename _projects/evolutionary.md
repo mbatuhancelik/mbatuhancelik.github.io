@@ -9,9 +9,6 @@ description: "Course term project: framing FPGA high-level-synthesis design spac
 
 Term project for CMPE583, Reconfigurable Computing, Boğaziçi University, taught by Prof. Arda Yurdakul. Joint work with Ilgaz Er.
 
-<!-- TODO (Batuhan): if you want the report linked here, upload the PDF to the repo and add the
-     link on this line. I have not written a link to a file that does not exist. -->
-
 ## Abstract
 
 An FPGA design is parametrized by pragmas and synthesis options that unroll loops, pipeline them, and partition arrays. Optimizing design parameters is an integer-boolean problem by definition. However, the quantities to be optimized, latency and resource usage, admit no closed form, since the internal heuristics of the synthesis tool are not exposed. Design space exploration is therefore carried out by hand, and the number of designs a project can consider is bounded by the designer's time. We aim to automate this process with a genetic algorithm in which pragmas map directly onto chromosomes and an infeasible offspring of an infeasible parent is excluded from selection, so that the population oscillates along the resource constraint rather than drifting past it. On a dilation kernel targeting a device with 8,000 LUTs, latency falls from 148,481 cycles at generation 0 to 62,465 at generation 24. Merging two independently converged populations did not improve on either parent under the constraint: the fastest design the merge produced requires 180% of the device's LUTs.
