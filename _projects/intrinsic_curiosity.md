@@ -85,7 +85,7 @@ Rotation is not among the action primitives, which permit only grasping and plac
   <p style="font-style: italic; color: #666; margin-top: 8px;">Fig. 4: Emergent rotation. A controlled collapse yields a configuration absent from the training distribution.</p>
 </div>
 
-A second theme is interaction with the base of a composite structure. Since the primitives are top-down, targeting a foundational block displaces the objects resting above it. Predicting such a transition requires resolving several tiers of relations, which is where Relational DeepSym is weakest and where council disagreement is correspondingly highest.
+A second theme is interaction with the base of a composite structure. Since the primitives are top-down, targeting a foundational block displaces the objects resting 2 layers above it. Predicting such a transition requires resolving several tiers of convoluted relations. Notably, the model can resolve which object moves as well as which objects remain stationary.
 
 <div style="text-align: center; margin: 20px auto; max-width:100%;">
   <video width="100%" controls autoplay loop muted playsinline poster="/images/complex_cut_demo_poster.jpg" style="border-radius: 4px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
