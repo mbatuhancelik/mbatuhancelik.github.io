@@ -25,10 +25,10 @@ author:
   # Biographic information
   avatar           : "profile.jpg"
   name             : "Batuhan Çelik"
-  pronouns         : "They/them"
+  pronouns         : # we dont use this field, dont change it
   bio              : "Applying for master's/PhD admission, Fall 2027. Symbolic representation learning and curiosity-driven exploration for embodied agents." #TODO: edit this depending on your application
   location         : "Ankara, Turkey"
-  employer         : "Boğaziçi University"
+  employer         : "B.S. 2025, Boğaziçi University"
   uri              : # URL
   email            : "batuhancelik.boun@gmail.com" 
 
