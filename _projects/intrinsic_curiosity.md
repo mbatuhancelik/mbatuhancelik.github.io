@@ -31,9 +31,9 @@ Our previous work, [Developmental Scaffolding with Large Language Models](/publi
 
 ## Method
 
-Let $$D$$ be a dataset of state-action-effect triplets and $$\{f_0, \dots, f_k\}$$ a set of forward models trained on overlapping subsets of $$D$$. If $$D$$ contains sufficiently many samples of a given transition, most members will learn it; conversely, disagreement among members on a state-action pair indicates that the pair is not yet learned and that further samples of it will reinforce training. This is the argument underlying Query by Committee [\[2\]](#ref-2), and it has been applied to exploration by Pathak et al. [\[3\]](#ref-3) and by Sancaktar et al. [\[4\]](#ref-4). The motivation signal for a candidate action sequence is the trace of the covariance across the flattened predictions of the council:
+Let $$D$$ be a dataset of state-action-effect triplets and $$\{f_0, \dots, f_k\}$$ a council of forward models trained on overlapping subsets of $$D$$. If $$D$$ contains sufficiently many samples of a given transition, most members will learn it; conversely, disagreement among members on a state-action pair indicates that the pair is not yet learned and that further samples of it will reinforce training. This is the argument underlying Query by Committee [\[2\]](#ref-2), and it has been applied to exploration by Pathak et al. [\[3\]](#ref-3) and by Sancaktar et al. [\[4\]](#ref-4). The motivation signal for a candidate action sequence is the trace of the covariance across the flattened predictions of the council:
 
-$$motivation(s, a_i, \{f_0, \dots, f_k\}) = \sum \text{trace}\left(\text{cov}\begin{bmatrix} \text{predict}(f_0(s, a_0, \dots, a_i)) \\ \vdots \\ \text{predict}(f_k(s, a_0, \dots, a_i)) \end{bmatrix}\right)$$
+$$\text{motivation}(s, a_i, \{f_0, \dots, f_k\}) = \sum \text{trace}\left(\text{cov}\begin{bmatrix} \text{predict}(f_0(s, a_0, \dots, a_i)) \\ \vdots \\ \text{predict}(f_k(s, a_0, \dots, a_i)) \end{bmatrix}\right)$$
 
 The formulation is vectorized, so signals for many candidate actions are evaluated in parallel on a GPU. For horizons greater than one, `predict` concatenates the predicted effect after each action rather than using the final predicted state, since members reaching a common final state through different erroneous intermediate predictions would otherwise register as agreement.
 
