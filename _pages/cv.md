@@ -106,12 +106,14 @@ I work on neurosymbolic approaches to robot learning: extracting discrete, compo
 *Both projects below were advised by Prof. Arda Yurdakul, Boğaziçi University.*
 
 ### **FPGA Design Space Exploration via Constraint-Aware Genetic Algorithms** *(CMPE583 Reconfigurable Computing Term Project)*
+*Batuhan Celik, Ilgaz Er, advised by Prof.Arda Yurdakul*
 * **Methodology:** Modeled non-convex High-Level Synthesis (HLS) design parameter search in Vitis HLS as an integer-boolean optimization problem, and argued for evolutionary algorithms as the appropriate method for this problem class. Mapped synthesis pragmas (array partitioning, loop unrolling, pipelining) directly into chromosome representations.
 * **System Design:** Implemented a selection rule that makes candidates oscillate along a strict resource constraint (8,000 LUTs), and built a Python-Tcl controller managing parallel HLS compilation instances. Mapped the Pareto frontier between latency and LUT utilization.
 
   [Project Page](/projects/evolutionary) with full problem definition and methodology.
 
 ### **Autonomous RC Vehicle Architecture** *(1st Place – CMPE443 Competition)*
+*Batuhan Celik, Ilgaz Er, advised by Prof.Arda Yurdakul*
 * Wrote bare-metal C firmware for STM32 Nucleo-144 boards using direct register manipulation, without HAL dependencies.
 * Tuned hardware execution profiles for real-time sensor processing, trading energy consumption against motor speed.
 
