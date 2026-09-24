@@ -77,7 +77,7 @@ All experiments use `gpt-3.5-turbo` at temperature 0.
 
 ## My contributions
 
-- Wrote the survey of LLM-robotics grounding strategies and parental scaffolding that frames the study, which reviewers singled out for its coverage.
+- Wrote the survey of LLM-robotics grounding strategies in the introduction, which reviewers singled out for its coverage.
 - Co-developed the PyBullet UR10 environment and its discrete pick-and-place action space.
 - Devised the token-efficient prompting strategy, including the state description generation and the history summarization that removes the need for a dialogue across a session.
 - Designed and ran the experiments against the random exploration baseline, and produced the figures and the video.
