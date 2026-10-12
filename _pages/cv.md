@@ -17,7 +17,7 @@ redirect_from:
 
 ## Research Interests
 
-Neurosymbolic robot learning: how an agent discovers discrete, compositional symbols from its own sensorimotor experience, and how it should choose which experience to collect. My current interest is what it would take for those symbols to be causal rather than merely predictive.
+Symbolic representations: how to extract them from raw sensory data in a self-supervised manner, and which inductive biases let a model learn disentangled symbols and compose them to support counterfactual reasoning. Supported by active learning to allow robots to build their own curriculum of increasing complexity.
 
 ## Education
 

@@ -12,7 +12,7 @@ site_theme               : "default" # The available themes options are "default
 title                    : "Batuhan Çelik"
 title_separator          : "·"
 name                     : &name "Batuhan Çelik"
-description              : &description "Batuhan Çelik — symbolic representation learning and curiosity-driven exploration for embodied agents. Publications, projects, and CV."   # Update this with a general description of your site, this is the default if not overridden by a page
+description              : &description "Batuhan Çelik: symbolic representation learning and active exploration for embodied agents. Publications, projects, and CV."   # Update this with a general description of your site, this is the default if not overridden by a page
 url                      : https://mbatuhancelik.github.io # The base hostname & protocol for your site e.g. "https://[your GitHub username].github.io",
                                                            # or if you already have some other page hosted on Github then use "https://[your GitHub username].github.io/[Your Repo Name]"
 baseurl                  : "" # the subpath of your site, e.g. "/blog"
@@ -26,7 +26,7 @@ author:
   avatar           : "profile.jpg"
   name             : "Batuhan Çelik"
   pronouns         : # we dont use this field, dont change it
-  bio              : "Applying for master's/PhD admission, Fall 2027. Symbolic representation learning and curiosity-driven exploration for embodied agents." #TODO: edit this depending on your application
+  bio              : "Applying for master's and PhD admission, Fall 2027. Symbolic representation learning and active exploration for embodied agents."
   location         : "Ankara, Turkey"
   employer         : "B.S. 2025, Boğaziçi University"
   uri              : # URL
